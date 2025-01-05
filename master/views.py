@@ -2,7 +2,7 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from django.db import connection  # Untuk menjalankan query langsung
+from django.db import connection, connections  # Untuk menjalankan query langsung
 from django.utils.timezone import now
 # from django.http import JsonResponse
 
@@ -15,14 +15,13 @@ class JenisBahanViewSet(ViewSet):
 
     @swagger_auto_schema(
         manual_parameters=[
-            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING)
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
         ],
         responses={200: "Success"}
     )
-
     def list(self, request):
         """ Mendapatkan semua data tb_jenisbahan yang belum dihapus """
-        with connection.cursor() as cursor:
+        with connections['mysql'].cursor() as cursor:
             cursor.execute("SELECT id, nama_jenis, created_by, created_date, updated_by, updated_date, is_deleted FROM tb_jenisbahan WHERE is_deleted = 0")
             rows = cursor.fetchall()
 
@@ -40,6 +39,19 @@ class JenisBahanViewSet(ViewSet):
         ]
         return Response(data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
+        ],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['nama_jenis'],
+            properties={
+                'nama_jenis': openapi.Schema(type=openapi.TYPE_STRING, description="Nama jenis bahan"),
+            }
+        ),
+        responses={201: "Created"},
+    )
     def create(self, request):
         """ Menambahkan data baru ke tb_jenisbahan """
         nama_jenis = request.data.get("nama_jenis")
@@ -49,21 +61,28 @@ class JenisBahanViewSet(ViewSet):
         if not nama_jenis:
             return Response({"error": "NamaJenis is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        with connection.cursor() as cursor:
+        with connections['mysql'].cursor() as cursor:
             cursor.execute(
                 """
                 INSERT INTO tb_jenisbahan (nama_jenis, created_by, created_date, updated_by, updated_date, is_deleted) 
-                VALUES (%s, %s, %s, %s, %s, 0) RETURNING id
+                VALUES (%s, %s, %s, %s, %s, 0)
                 """,
                 [nama_jenis, username, created_date, username, created_date]
             )
-            new_id = cursor.fetchone()[0]
+            new_id = cursor.lastrowid
 
         return Response({"id": new_id, "nama_jenis": nama_jenis}, status=status.HTTP_201_CREATED)
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('id', openapi.IN_PATH, description="ID Jenis Bahan", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
+        ],
+        responses={200: "Success"},
+    )
     def retrieve(self, request, pk=None):
         """ Mendapatkan detail data berdasarkan ID """
-        with connection.cursor() as cursor:
+        with connections['mysql'].cursor() as cursor:
             cursor.execute("SELECT id, nama_jenis, created_by, created_date, updated_by, updated_date, is_deleted FROM tb_jenisbahan WHERE id = %s", [pk])
             row = cursor.fetchone()
 
@@ -83,6 +102,19 @@ class JenisBahanViewSet(ViewSet):
         else:
             return Response({"error": "Data not found"}, status=status.HTTP_404_NOT_FOUND)
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
+        ],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['nama_jenis'],
+            properties={
+                'nama_jenis': openapi.Schema(type=openapi.TYPE_STRING, description="Nama jenis bahan"),
+            }
+        ),
+        responses={200: "Updated"},
+    )
     def update(self, request, pk=None):
         """ Mengupdate data berdasarkan ID """
         nama_jenis = request.data.get("nama_jenis")
@@ -92,7 +124,7 @@ class JenisBahanViewSet(ViewSet):
         if not nama_jenis:
             return Response({"error": "NamaJenis is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        with connection.cursor() as cursor:
+        with connections['mysql'].cursor() as cursor:
             cursor.execute(
                 "UPDATE tb_jenisbahan SET nama_jenis=%s, updated_by=%s, updated_date=%s WHERE id=%s",
                 [nama_jenis, username, updated_date, pk]
@@ -100,12 +132,18 @@ class JenisBahanViewSet(ViewSet):
 
         return Response({"id": pk, "nama_jenis": nama_jenis, "updated_by": username, "updated_date": updated_date}, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
+        ],
+        responses={204: "Deleted"},
+    )
     def destroy(self, request, pk=None):
         """ Soft Delete: Menandai data sebagai is_deleted = 1 """
         username = request.user.username  # Username pengguna yang login
         updated_date = now()
 
-        with connection.cursor() as cursor:
+        with connections['mysql'].cursor() as cursor:
             cursor.execute(
                 "UPDATE tb_jenisbahan SET is_deleted=1, updated_by=%s, updated_date=%s WHERE id=%s",
                 [username, updated_date, pk]
