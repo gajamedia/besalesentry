@@ -6,9 +6,22 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 class TokenViewSet(ViewSet):
     permission_classes = [AllowAny]  # Tidak memerlukan autentikasi untuk mendapatkan token
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['username', 'password'],
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description="Username akun"),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, description="Password akun"),
+            },
+        )
+    )
     def create(self, request):
         """
         POST: Mendapatkan token dengan username dan password
