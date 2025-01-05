@@ -6,8 +6,19 @@ from django.db import connection  # Untuk menjalankan query langsung
 from django.utils.timezone import now
 # from django.http import JsonResponse
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
+
 class JenisBahanViewSet(ViewSet):
     permission_classes = [IsAuthenticated]  # API hanya bisa diakses oleh user yang login
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING)
+        ],
+        responses={200: "Success"}
+    )
 
     def list(self, request):
         """ Mendapatkan semua data tb_jenisbahan yang belum dihapus """
