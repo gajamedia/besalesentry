@@ -35,14 +35,14 @@ CREATE TABLE `tb_bahan` (
 DROP TABLE IF EXISTS `tb_jenisbahan`;
 
 CREATE TABLE `tb_jenisbahan` (
-  `ID` int NOT NULL AUTO_INCREMENT,
-  `NamaJenis` varchar(255) DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nama_jenis` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `created_by` varchar(100) DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_by` varchar(100) DEFAULT NULL,
   `updated_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `is_deleted` int DEFAULT '0',
-  PRIMARY KEY (`ID`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*Data for the table `tb_jenisbahan` */
