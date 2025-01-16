@@ -18,7 +18,7 @@ Including another URLconf
 # from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 # from rest_framework.routers import DefaultRouter
 from gettoken.views import TokenViewSet
-from master.views import JenisBahanViewSet
+from master.views import JenisBahanViewSet, BahanViewSet
 
 from django.contrib import admin
 from django.urls import path, re_path
@@ -65,6 +65,14 @@ urlpatterns = [
     path('api/jenisbahan/<int:pk>/', JenisBahanViewSet.as_view({'get': 'retrieve'}), name='retrieve_jenisbahan'),
     path('api/jenisbahan/<int:pk>/update/', JenisBahanViewSet.as_view({'put': 'update'}), name='update_jenisbahan'),
     path('api/jenisbahan/<int:pk>/delete/', JenisBahanViewSet.as_view({'put': 'destroy'}), name='delete_jenisbahan'),  
+
+    # Master Bahan
+    path('api/bahan/list/', BahanViewSet.as_view({'get': 'list'}), name='list_bahan'),
+    path('api/bahan/listpagination/', BahanViewSet.as_view({'get': 'list_pagination'}), name='list_pagination_bahan'),
+    path('api/bahan/create/', BahanViewSet.as_view({'post': 'create'}), name='create_bahan'),
+    path('api/bahan/<int:pk>/', BahanViewSet.as_view({'get': 'retrieve'}), name='retrieve_bahan'),
+    path('api/bahan/<int:pk>/update/', BahanViewSet.as_view({'put': 'update'}), name='update_bahan'),
+    path('api/bahan/<int:pk>/delete/', BahanViewSet.as_view({'put': 'destroy'}), name='delete_bahan'),  
 
     # path('api/jenisbahan/retrieve/', TokenViewSet.as_view({'get': 'retrieve'}), name='retrieve_jenisbahan'),
     # path('api/jenisbahan/update/', TokenViewSet.as_view({'put': 'update'}), name='update_jenisbahan'),
