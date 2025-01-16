@@ -8,11 +8,18 @@ from django.utils.timezone import now
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from rest_framework.pagination import PageNumberPagination
+from django.core.paginator import Paginator
 
+class JenisBahanPagination(PageNumberPagination):
+    page_size = 10  # Jumlah item per halaman
+    page_size_query_param = 'page_size'  # Query parameter untuk mengatur jumlah item per halaman
+    max_page_size = 100  # Batas maksimal item per halaman
 
 class JenisBahanViewSet(ViewSet):
     permission_classes = [IsAuthenticated]  # API hanya bisa diakses oleh user yang login
-
+    pagination_class = JenisBahanPagination  # Menetapkan pagination
+    
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
@@ -38,6 +45,70 @@ class JenisBahanViewSet(ViewSet):
             for row in rows
         ]
         return Response(data, status=status.HTTP_200_OK)
+
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'Authorization', openapi.IN_HEADER, 
+                description="Token JWT, silakan tambahkan 'Bearer ' sebelum token Anda", 
+                type=openapi.TYPE_STRING
+            ),
+            openapi.Parameter(
+                'page', openapi.IN_QUERY, 
+                description="Nomor halaman", 
+                type=openapi.TYPE_INTEGER
+            ),
+            openapi.Parameter(
+                'page_size', openapi.IN_QUERY, 
+                description="Jumlah item per halaman", 
+                type=openapi.TYPE_INTEGER
+            )
+        ],
+        responses={200: "Success"}
+    )
+    def list_pagination(self, request):
+        """ Mendapatkan semua data tb_jenisbahan yang belum dihapus dengan pagination """
+        page = request.GET.get('page', 1)  # Default halaman pertama
+        page_size = request.GET.get('page_size', 10)  # Default 10 item per halaman
+
+        with connections['mysql'].cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT id, nama_jenis, created_by, created_date, updated_by, updated_date, is_deleted 
+                FROM tb_jenisbahan WHERE is_deleted = 0
+                """
+            )
+            rows = cursor.fetchall()
+
+        data = [
+            {
+                "id": row[0],
+                "nama_jenis": row[1],
+                "created_by": row[2],
+                "created_date": row[3],
+                "updated_by": row[4],
+                "updated_date": row[5],
+                "is_deleted": row[6],
+            }
+            for row in rows
+        ]
+
+        # Menggunakan Paginator untuk pagination manual
+        paginator = Paginator(data, page_size)
+        paginated_data = paginator.get_page(page)
+
+        response_data = {
+            "count": paginator.count,
+            "total_pages": paginator.num_pages,
+            "current_page": paginated_data.number,
+            "next": paginated_data.next_page_number() if paginated_data.has_next() else None,
+            "previous": paginated_data.previous_page_number() if paginated_data.has_previous() else None,
+            "results": paginated_data.object_list,
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
 
     @swagger_auto_schema(
         manual_parameters=[
