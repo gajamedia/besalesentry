@@ -52,7 +52,8 @@ class JenisBahanViewSet(ViewSet):
             openapi.Parameter(
                 'Authorization', openapi.IN_HEADER, 
                 description="Token JWT, silakan tambahkan 'Bearer ' sebelum token Anda", 
-                type=openapi.TYPE_STRING
+                type=openapi.TYPE_STRING,
+                default="Bearer "
             ),
             openapi.Parameter(
                 'page', openapi.IN_QUERY, 
