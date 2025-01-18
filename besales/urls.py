@@ -62,6 +62,7 @@ urlpatterns = [
     path('api/jenisbahan/list/', JenisBahanViewSet.as_view({'get': 'list'}), name='list_jenisbahan'),
     path('api/jenisbahan/listpagination/', JenisBahanViewSet.as_view({'get': 'list_pagination'}), name='list_pagination_jenisbahan'),
     path('api/jenisbahan/create/', JenisBahanViewSet.as_view({'post': 'create'}), name='create_jenisbahan'),
+    path('api/jenisbahan/search/', JenisBahanViewSet.as_view({'get': 'search'}), name='search_jenisbahan'),
     path('api/jenisbahan/<int:pk>/', JenisBahanViewSet.as_view({'get': 'retrieve'}), name='retrieve_jenisbahan'),
     path('api/jenisbahan/<int:pk>/update/', JenisBahanViewSet.as_view({'put': 'update'}), name='update_jenisbahan'),
     path('api/jenisbahan/<int:pk>/delete/', JenisBahanViewSet.as_view({'put': 'destroy'}), name='delete_jenisbahan'),  
