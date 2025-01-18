@@ -11,6 +11,9 @@ from drf_yasg import openapi
 from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator
 
+from rest_framework.decorators import action
+# from django.db.models import Q  # Untuk query pencarian
+
 class PagePagination(PageNumberPagination):
     page_size = 10  # Jumlah item per halaman
     page_size_query_param = 'page_size'  # Query parameter untuk mengatur jumlah item per halaman
@@ -223,7 +226,71 @@ class JenisBahanViewSet(ViewSet):
 
         return Response({"message": "Soft deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('search', openapi.IN_QUERY, description="Search query", type=openapi.TYPE_STRING),
+            openapi.Parameter('page', openapi.IN_QUERY, description="Page number", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('page_size', openapi.IN_QUERY, description="Page size", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer "),
+        ],
+        responses={200: "Success"}
+    )
+    @action(detail=False, methods=["get"], url_path="search")
+    def search(self, request):
+        """
+        Search data tb_jenisbahan berdasarkan beberapa field dengan pagination
+        """
+        search_query = request.GET.get("search", "")
+        page = int(request.GET.get("page", 1))
+        page_size = int(request.GET.get("page_size", 10))
 
+        with connections["mysql"].cursor() as cursor:
+            # Hitung total hasil
+            cursor.execute("""
+                SELECT COUNT(*) 
+                FROM tb_jenisbahan 
+                WHERE is_deleted = 0 AND (
+                    nama_jenis LIKE %s OR 
+                    created_by LIKE %s OR 
+                    updated_by LIKE %s
+                )
+            """, [f"%{search_query}%", f"%{search_query}%", f"%{search_query}%"])
+            total_items = cursor.fetchone()[0]
+
+            # Query dengan pagination
+            cursor.execute("""
+                SELECT id, nama_jenis, created_by, created_date, updated_by, updated_date, is_deleted
+                FROM tb_jenisbahan
+                WHERE is_deleted = 0 AND (
+                    nama_jenis LIKE %s OR 
+                    created_by LIKE %s OR 
+                    updated_by LIKE %s
+                )
+                LIMIT %s OFFSET %s
+            """, [f"%{search_query}%", f"%{search_query}%", f"%{search_query}%", page_size, (page - 1) * page_size])
+
+            rows = cursor.fetchall()
+
+        data = [
+            {
+                "id": row[0],
+                "nama_jenis": row[1],
+                "created_by": row[2],
+                "created_date": row[3],
+                "updated_by": row[4],
+                "updated_date": row[5],
+                "is_deleted": row[6],
+            }
+            for row in rows
+        ]
+
+        return Response({
+            "count": total_items,
+            "total_pages": (total_items // page_size) + (1 if total_items % page_size else 0),
+            "current_page": page,
+            "results": data
+        }, status=status.HTTP_200_OK)
+    
 class BahanViewSet(ViewSet):
     permission_classes = [IsAuthenticated]  # API hanya bisa diakses oleh user yang login
     pagination_class = PagePagination  # Menetapkan pagination
