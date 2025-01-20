@@ -19,6 +19,7 @@ Including another URLconf
 # from rest_framework.routers import DefaultRouter
 from gettoken.views import TokenViewSet
 from master.views import JenisBahanViewSet, BahanViewSet
+from transaksi.project.views import ProjectHeaderViewSet
 
 from django.contrib import admin
 from django.urls import path, re_path
@@ -75,6 +76,10 @@ urlpatterns = [
     path('api/bahan/<int:pk>/', BahanViewSet.as_view({'get': 'retrieve'}), name='retrieve_bahan'),
     path('api/bahan/<int:pk>/update/', BahanViewSet.as_view({'put': 'update'}), name='update_bahan'),
     path('api/bahan/<int:pk>/delete/', BahanViewSet.as_view({'put': 'destroy'}), name='delete_bahan'),  
+
+    # Transaksi Project
+    path('api/project/create/', ProjectHeaderViewSet.as_view({'post': 'create'}), name='create_project_header'),
+    path('api/project/search/', ProjectHeaderViewSet.as_view({'get': 'search'}), name='search_project_header'),
 
     # path('api/jenisbahan/retrieve/', TokenViewSet.as_view({'get': 'retrieve'}), name='retrieve_jenisbahan'),
     # path('api/jenisbahan/update/', TokenViewSet.as_view({'put': 'update'}), name='update_jenisbahan'),
