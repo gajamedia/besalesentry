@@ -71,6 +71,7 @@ urlpatterns = [
     path('api/bahan/list/', BahanViewSet.as_view({'get': 'list'}), name='list_bahan'),
     path('api/bahan/listpagination/', BahanViewSet.as_view({'get': 'list_pagination'}), name='list_pagination_bahan'),
     path('api/bahan/create/', BahanViewSet.as_view({'post': 'create'}), name='create_bahan'),
+    path('api/bahan/search/', BahanViewSet.as_view({'get': 'search'}), name='search_bahan'),
     path('api/bahan/<int:pk>/', BahanViewSet.as_view({'get': 'retrieve'}), name='retrieve_bahan'),
     path('api/bahan/<int:pk>/update/', BahanViewSet.as_view({'put': 'update'}), name='update_bahan'),
     path('api/bahan/<int:pk>/delete/', BahanViewSet.as_view({'put': 'destroy'}), name='delete_bahan'),  
