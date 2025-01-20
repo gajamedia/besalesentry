@@ -524,3 +524,74 @@ class BahanViewSet(ViewSet):
             )
 
         return Response({"message": "Soft deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('search', openapi.IN_QUERY, description="Search by item_code or item_name", type=openapi.TYPE_STRING),
+            openapi.Parameter('page', openapi.IN_QUERY, description="Page number", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('page_size', openapi.IN_QUERY, description="Page size", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
+        ],
+        responses={200: "Success"}
+    )
+    @action(detail=False, methods=["get"], url_path="search")
+    def search(self, request):
+        """ Search data bahan with pagination """
+        search_query = request.GET.get("search", "")
+        page = int(request.GET.get("page", 1))
+        page_size = int(request.GET.get("page_size", 10))
+
+        with connections["mysql"].cursor() as cursor:
+            # Hitung total data
+            cursor.execute("""
+                SELECT COUNT(*) 
+                FROM tb_bahan 
+                WHERE is_deleted = 0 AND (
+                    item_code LIKE %s OR 
+                    item_name LIKE %s OR
+
+                )
+            """, [f"%{search_query}%", f"%{search_query}%"])
+            total_items = cursor.fetchone()[0]
+
+            # Ambil data sesuai pagination
+            cursor.execute("""
+                SELECT b.id, b.item_code, b.item_name, b.id_jenis, j.nama_jenis, b.ukuran, b.keterangan, b.created_by, 
+                       b.created_date, b.updated_by, b.updated_date, b.is_deleted
+                FROM tb_bahan b
+                LEFT JOIN tb_jenisbahan j ON b.id_jenis = j.id
+                WHERE b.is_deleted = 0 AND (
+                    b.item_code LIKE %s OR 
+                    b.item_name LIKE %s OR
+                    b.ukuran LIKE %s OR
+                    b.keterangan LIKE %s
+                )
+                LIMIT %s OFFSET %s
+            """, [f"%{search_query}%", f"%{search_query}%", f"%{search_query}%", f"%{search_query}%", page_size, (page - 1) * page_size])
+
+            rows = cursor.fetchall()
+
+        data = [
+            {
+                "id": row[0],
+                "item_code": row[1],
+                "item_name": row[2],
+                "id_jenis": row[3],
+                "nama_jenis": row[4],
+                "ukuran": row[5],
+                "keterangan": row[6],
+                "created_by": row[7],
+                "created_date": row[8],
+                "updated_by": row[9],
+                "updated_date": row[10],
+                "is_deleted": row[11],
+            }
+            for row in rows
+        ]
+
+        return Response({
+            "count": total_items,
+            "total_pages": (total_items // page_size) + (1 if total_items % page_size else 0),
+            "current_page": page,
+            "results": data
+        }, status=status.HTTP_200_OK)
