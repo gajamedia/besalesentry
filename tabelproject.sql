@@ -57,6 +57,7 @@ CREATE TABLE `tb_project_header` (
   `nama_customer` varchar(100) DEFAULT NULL,
   `addr_customer` varchar(150) DEFAULT NULL,
   `contact_customer` varchar(30) DEFAULT NULL,
+  `status_project` char(1) DEFAULT '0' COMMENT '0:Fu;1:kontrak;2:pengerjaan;3:pemasangan;4:pengecekan;5:penagihan;6:lunas',
   `created_by` varchar(100) DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT NULL,
   `updated_by` varchar(100) DEFAULT NULL,
