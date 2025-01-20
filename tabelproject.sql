@@ -35,6 +35,7 @@ CREATE TABLE `tb_project_detil` (
   `elevasi` int DEFAULT '0',
   `tinggi_vitrase` int DEFAULT '0',
   `tinggi_lipatan` int DEFAULT '0' COMMENT '+tinggi',
+  `nilai_pembagi` int DEFAULT '0',
   `created_by` varchar(100) DEFAULT NULL,
   `created_date` timestamp NULL DEFAULT NULL,
   `updated_by` varchar(100) DEFAULT NULL,
