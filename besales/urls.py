@@ -78,7 +78,9 @@ urlpatterns = [
     path('api/bahan/<int:pk>/delete/', BahanViewSet.as_view({'put': 'destroy'}), name='delete_bahan'),  
 
     # Transaksi Project
+    path('api/project/list/', ProjectHeaderViewSet.as_view({'get': 'list'}), name='list_projectheader'),
     path('api/project/create/', ProjectHeaderViewSet.as_view({'post': 'create'}), name='create_project_header'),
+    path('api/project/<int:pk>/', ProjectHeaderViewSet.as_view({'get': 'retrieve'}), name='retrieve_projectheader'),
     path('api/project/search/', ProjectHeaderViewSet.as_view({'get': 'search'}), name='search_project_header'),
 
     # path('api/jenisbahan/retrieve/', TokenViewSet.as_view({'get': 'retrieve'}), name='retrieve_jenisbahan'),
