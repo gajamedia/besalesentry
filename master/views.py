@@ -548,8 +548,7 @@ class BahanViewSet(ViewSet):
                 FROM tb_bahan 
                 WHERE is_deleted = 0 AND (
                     item_code LIKE %s OR 
-                    item_name LIKE %s OR
-
+                    item_name LIKE %s
                 )
             """, [f"%{search_query}%", f"%{search_query}%"])
             total_items = cursor.fetchone()[0]
