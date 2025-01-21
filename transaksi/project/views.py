@@ -189,7 +189,7 @@ class ProjectHeaderViewSet(viewsets.ViewSet):
             cursor.execute("""
                 SELECT id, no_project, tgl_project, ket_project, nama_customer, 
                     addr_customer, contact_customer, status_project, created_by, created_date, updated_by, updated_date, is_deleted
-                FROM tb_jenisbahan
+                FROM tb_project_header
                 WHERE is_deleted = 0 AND (
                     no_project LIKE %s OR 
                     tgl_project LIKE %s OR 
