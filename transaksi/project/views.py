@@ -19,6 +19,41 @@ class PagePagination(PageNumberPagination):
 class ProjectHeaderViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]  # API hanya bisa diakses oleh user yang login
 
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
+        ],
+        responses={200: "Success"}
+    )
+    def list(self, request):
+        """ Mendapatkan semua data tb_project_header yang belum dihapus """
+        with connections['mysql'].cursor() as cursor:
+            cursor.execute("SELECT id, no_project, tgl_project, ket_project, nama_customer, " + 
+                           "addr_customer, contact_customer, status_project, created_by, created_date, updated_by, updated_date, is_deleted " + 
+                           "FROM tb_project_header WHERE is_deleted = 0")
+            rows = cursor.fetchall()
+
+        data = [
+            {
+                "id": row[0],
+                "no_project": row[1],
+                "tgl_project": row[2],
+                "ket_project": row[3],
+                "nama_customer": row[4],
+                "addr_customer": row[5],
+                "contact_customer": row[6],
+                "status_project": row[7],
+                "created_by": row[8],
+                "created_date": row[9],
+                "updated_by": row[10],
+                "updated_date": row[11],
+                "is_deleted": row[12],
+            }
+            for row in rows
+        ]
+        return Response(data, status=status.HTTP_200_OK)
+
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
@@ -72,6 +107,43 @@ class ProjectHeaderViewSet(viewsets.ViewSet):
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('id', openapi.IN_PATH, description="ID Project Header", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
+        ],
+        responses={200: "Success"},
+    )
+    def retrieve(self, request, pk=None):
+        """ Mendapatkan detail data berdasarkan ID """
+        with connections['mysql'].cursor() as cursor:
+            cursor.execute("SELECT id, no_project, tgl_project, ket_project, nama_customer, " + 
+                           "addr_customer, contact_customer, status_project, created_by, created_date, updated_by, updated_date, is_deleted " + 
+                           "FROM tb_project_header WHERE id = %s", [pk])
+            row = cursor.fetchone()
+
+        if row:
+            return Response(
+                {
+                    "id": row[0],
+                    "no_project": row[1],
+                    "tgl_project": row[2],
+                    "ket_project": row[3],
+                    "nama_customer": row[4],
+                    "addr_customer": row[5],
+                    "contact_customer": row[6],
+                    "status_project": row[7],
+                    "created_by": row[8],
+                    "created_date": row[9],
+                    "updated_by": row[10],
+                    "updated_date": row[11],
+                    "is_deleted": row[12],
+                },
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response({"error": "Data not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
     @swagger_auto_schema(
