@@ -305,7 +305,8 @@ class BahanViewSet(ViewSet):
         """ Mendapatkan semua data tb_bahan yang belum dihapus """
         with connections['mysql'].cursor() as cursor:
             cursor.execute("SELECT id, item_code, item_name, id_jenis, ukuran, keterangan," + 
-                           "created_by, created_date, updated_by, updated_date, is_deleted FROM tb_bahan WHERE is_deleted = 0")
+                           "created_by, created_date, updated_by, updated_date, is_deleted," +
+                           "harga_beli, harga_jual FROM tb_bahan WHERE is_deleted = 0")
             rows = cursor.fetchall()
 
         data = [
@@ -321,6 +322,8 @@ class BahanViewSet(ViewSet):
                 "updated_by": row[8],
                 "updated_date": row[9],
                 "is_deleted": row[10],
+                "harga_beli": row[11],
+                "harga_jual": row[12]
             }
             for row in rows
         ]
@@ -342,7 +345,9 @@ class BahanViewSet(ViewSet):
 
         with connections['mysql'].cursor() as cursor:
             cursor.execute("""
-                SELECT id, item_code, item_name, id_jenis, ukuran, keterangan, created_by, created_date, updated_by, updated_date, is_deleted
+                SELECT id, item_code, item_name, id_jenis, ukuran, keterangan, created_by, created_date, 
+                       updated_by, updated_date, is_deleted,
+                       harga_beli, harga_jual    
                 FROM tb_bahan
                 WHERE is_deleted = 0
             """
@@ -362,6 +367,8 @@ class BahanViewSet(ViewSet):
                 "updated_by": row[8],
                 "updated_date": row[9],
                 "is_deleted": row[10],
+                "harga_beli": row[11],
+                "harga_jual": row[12]
             }
             for row in rows
         ]
@@ -394,6 +401,8 @@ class BahanViewSet(ViewSet):
                 'id_jenis': openapi.Schema(type=openapi.TYPE_INTEGER),
                 'ukuran': openapi.Schema(type=openapi.TYPE_INTEGER),
                 'keterangan': openapi.Schema(type=openapi.TYPE_STRING, nullable=True),
+                'harga_beli': openapi.Schema(type=openapi.TYPE_NUMBER, format="float"),
+                'harga_jual': openapi.Schema(type=openapi.TYPE_NUMBER, format="float"),
             }
         ),
         responses={201: "Created"},
@@ -405,6 +414,8 @@ class BahanViewSet(ViewSet):
         id_jenis = request.data.get("id_jenis")
         ukuran = request.data.get("ukuran")
         keterangan = request.data.get("keterangan")
+        harga_beli = request.data.get("harga_beli")
+        harga_jual = request.data.get("harga_jual")
         username = request.user.username  # Username pengguna yang login
         created_date = now()
 
@@ -417,15 +428,17 @@ class BahanViewSet(ViewSet):
         with connections['mysql'].cursor() as cursor:
             cursor.execute(
                 """
-                INSERT INTO tb_bahan (item_code, item_name, id_jenis, ukuran, keterangan, created_by, created_date, updated_by, updated_date, is_deleted)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 0)
+                INSERT INTO tb_bahan (item_code, item_name, id_jenis, ukuran, keterangan, created_by, created_date, 
+                    harga_beli, harga_jual, updated_by, updated_date, is_deleted)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)
                 """,
-                [item_code, item_name, id_jenis, ukuran, keterangan, username, created_date, username, created_date]
+                [item_code, item_name, id_jenis, ukuran, keterangan, username, created_date, harga_beli, harga_jual, username, created_date]
             )
             new_id = cursor.lastrowid
 
         return Response({"id": new_id, "item_code": item_code, "item_name": item_name, 
-                         "id_jenis": id_jenis, "ukuran": ukuran, "keterangan": keterangan}, status=status.HTTP_201_CREATED)
+                         "id_jenis": id_jenis, "ukuran": ukuran, "keterangan": keterangan,
+                         "harga_beli": harga_beli, "harga_jual": harga_jual}, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(
         manual_parameters=[
@@ -438,7 +451,8 @@ class BahanViewSet(ViewSet):
         """ Mendapatkan detail data berdasarkan ID """
         with connections['mysql'].cursor() as cursor:
             cursor.execute("SELECT id, item_code, item_name, id_jenis, ukuran, keterangan, " + 
-                           "created_by, created_date, updated_by, updated_date, is_deleted FROM tb_bahan WHERE id = %s", [pk])
+                           "created_by, created_date, updated_by, updated_date, is_deleted, " +
+                           "harga_beli, harga_jual FROM tb_bahan WHERE id = %s", [pk])
             row = cursor.fetchone()
 
         if row:
@@ -455,6 +469,8 @@ class BahanViewSet(ViewSet):
                     "updated_by": row[8],
                     "updated_date": row[9],
                     "is_deleted": row[10],
+                    "harga_beli": row[11],
+                    "harga_jual": row[12],
                 },
                 status=status.HTTP_200_OK
             )
@@ -474,6 +490,8 @@ class BahanViewSet(ViewSet):
                 'id_jenis': openapi.Schema(type=openapi.TYPE_INTEGER),
                 'ukuran': openapi.Schema(type=openapi.TYPE_INTEGER),
                 'keterangan': openapi.Schema(type=openapi.TYPE_STRING, nullable=True),
+                'harga_beli': openapi.Schema(type=openapi.TYPE_NUMBER, format="float"),
+                'harga_jual': openapi.Schema(type=openapi.TYPE_NUMBER, format="float"),
             }
         ),
         responses={200: "Updated"},
@@ -485,6 +503,8 @@ class BahanViewSet(ViewSet):
         id_jenis = request.data.get("id_jenis")
         ukuran = request.data.get("ukuran")
         keterangan = request.data.get("keterangan")
+        harga_beli = request.data.get("harga_beli")
+        harga_jual = request.data.get("harga_jual")
         username = request.user.username  # Username pengguna yang login
         updated_date = now()
 
@@ -496,14 +516,15 @@ class BahanViewSet(ViewSet):
 
         with connections['mysql'].cursor() as cursor:
             cursor.execute("""
-                    UPDATE tb_bahan SET item_code=%s, item_name=%s, id_jenis=%s, ukuran=%s, keterangan=%s, updated_by=%s, updated_date=%s
+                    UPDATE tb_bahan SET item_code=%s, item_name=%s, id_jenis=%s, ukuran=%s, keterangan=%s, updated_by=%s, updated_date=%s, harga_beli=%s, harga_jual=%s
                     WHERE id=%s
                 """,
-                [item_code, item_name, id_jenis, ukuran, keterangan, username, updated_date, pk]
+                [item_code, item_name, id_jenis, ukuran, keterangan, username, updated_date, harga_beli, harga_jual, pk]
             )
 
         return Response({"id": pk, "item_code": item_code, "item_name": item_name, 
                          "id_jenis": id_jenis, "ukuran": ukuran, "keterangan": keterangan, 
+                         "harga_beli": harga_beli, "harga_jual": harga_jual,
                          "updated_by": username, "updated_date": updated_date}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -556,17 +577,19 @@ class BahanViewSet(ViewSet):
             # Ambil data sesuai pagination
             cursor.execute("""
                 SELECT b.id, b.item_code, b.item_name, b.id_jenis, j.nama_jenis, b.ukuran, b.keterangan, b.created_by, 
-                       b.created_date, b.updated_by, b.updated_date, b.is_deleted
+                       b.created_date, b.updated_by, b.updated_date, b.is_deleted, b.harga_beli, b.harga_jual
                 FROM tb_bahan b
                 LEFT JOIN tb_jenisbahan j ON b.id_jenis = j.id
                 WHERE b.is_deleted = 0 AND (
                     b.item_code LIKE %s OR 
                     b.item_name LIKE %s OR
                     b.ukuran LIKE %s OR
-                    b.keterangan LIKE %s
+                    b.keterangan LIKE %s OR
+                    b.harga_beli LIKE %s OR
+                    b.harga_jual LIKE %s              
                 )
                 LIMIT %s OFFSET %s
-            """, [f"%{search_query}%", f"%{search_query}%", f"%{search_query}%", f"%{search_query}%", page_size, (page - 1) * page_size])
+            """, [f"%{search_query}%", f"%{search_query}%", f"%{search_query}%", f"%{search_query}%", f"%{search_query}%", f"%{search_query}%", page_size, (page - 1) * page_size])
 
             rows = cursor.fetchall()
 
@@ -584,6 +607,8 @@ class BahanViewSet(ViewSet):
                 "updated_by": row[9],
                 "updated_date": row[10],
                 "is_deleted": row[11],
+                "harga_beli": row[12],
+                "harga_jual": row[13],
             }
             for row in rows
         ]
