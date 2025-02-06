@@ -83,9 +83,15 @@ urlpatterns = [
     path('api/project/create/', ProjectHeaderViewSet.as_view({'post': 'create'}), name='create_project_header'),
     path('api/project/<int:pk>/', ProjectHeaderViewSet.as_view({'get': 'retrieve'}), name='retrieve_projectheader'),
     path('api/project/search/', ProjectHeaderViewSet.as_view({'get': 'search'}), name='search_project_header'),
+    path('api/project/<int:pk>/update/', ProjectHeaderViewSet.as_view({'put': 'update'}), name='update_project_header'),
+    path('api/project/<int:pk>/delete/', ProjectHeaderViewSet.as_view({'put': 'destroy'}), name='delete_project_header'),  
     # Project Detil
     path('api/projectdetil/list/', ProjectDetilViewSet.as_view({'get': 'list'}), name='list_project_detil'),
     path('api/projectdetil/create/', ProjectDetilViewSet.as_view({'post': 'create'}), name='create_project_detil'),
+    path('api/projectdetil/<int:pk>/', ProjectDetilViewSet.as_view({'get': 'retrieve'}), name='retrieve_project_detil'),
+    path('api/projectdetil/search/', ProjectDetilViewSet.as_view({'get': 'search'}), name='search_project_detil'),
+    path('api/projectdetil/<int:pk>/update/', ProjectDetilViewSet.as_view({'put': 'update'}), name='update_project_detil'),
+    path('api/projectdetil/<int:pk>/delete/', ProjectDetilViewSet.as_view({'put': 'destroy'}), name='delete_project_detil'),  
 
     # path('api/jenisbahan/retrieve/', TokenViewSet.as_view({'get': 'retrieve'}), name='retrieve_jenisbahan'),
     # path('api/jenisbahan/update/', TokenViewSet.as_view({'put': 'update'}), name='update_jenisbahan'),
