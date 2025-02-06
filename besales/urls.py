@@ -19,7 +19,7 @@ Including another URLconf
 # from rest_framework.routers import DefaultRouter
 from gettoken.views import TokenViewSet
 from master.views import JenisBahanViewSet, BahanViewSet
-from transaksi.project.views import ProjectHeaderViewSet
+from transaksi.project.views import ProjectHeaderViewSet, ProjectDetilViewSet
 
 from django.contrib import admin
 from django.urls import path, re_path
@@ -78,10 +78,14 @@ urlpatterns = [
     path('api/bahan/<int:pk>/delete/', BahanViewSet.as_view({'put': 'destroy'}), name='delete_bahan'),  
 
     # Transaksi Project
+    # Project Header
     path('api/project/list/', ProjectHeaderViewSet.as_view({'get': 'list'}), name='list_projectheader'),
     path('api/project/create/', ProjectHeaderViewSet.as_view({'post': 'create'}), name='create_project_header'),
     path('api/project/<int:pk>/', ProjectHeaderViewSet.as_view({'get': 'retrieve'}), name='retrieve_projectheader'),
     path('api/project/search/', ProjectHeaderViewSet.as_view({'get': 'search'}), name='search_project_header'),
+    # Project Detil
+    path('api/projectdetil/list/', ProjectDetilViewSet.as_view({'get': 'list'}), name='list_project_detil'),
+    path('api/projectdetil/create/', ProjectDetilViewSet.as_view({'post': 'create'}), name='create_project_detil'),
 
     # path('api/jenisbahan/retrieve/', TokenViewSet.as_view({'get': 'retrieve'}), name='retrieve_jenisbahan'),
     # path('api/jenisbahan/update/', TokenViewSet.as_view({'put': 'update'}), name='update_jenisbahan'),
