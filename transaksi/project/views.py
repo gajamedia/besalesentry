@@ -588,7 +588,7 @@ class ProjectDetilViewSet(viewsets.ViewSet):
 
             # Query dengan pagination
             cursor.execute("""
-                SELECT id, id_project_header, lebar_bahan, lantai, ruangan, bed, tipe 
+                SELECT id, id_project_header, lebar_bahan, lantai, ruangan, bed, tipe, uk_room_l, uk_room_p, uk_room_t, 
                     stik, elevasi, tinggi_vitrase, tinggi_lipatan, nilai_pembagi, created_by, created_date, updated_by, updated_date, is_deleted
                 FROM tb_project_detil
                 WHERE is_deleted = 0 AND (
@@ -618,11 +618,19 @@ class ProjectDetilViewSet(viewsets.ViewSet):
                 "ruangan": row[4], 
                 "bed": row[5], 
                 "tipe": row[6], 
-                "created_by": row[7],
-                "created_date": row[8],
-                "updated_by": row[9],
-                "updated_date": row[10],
-                "is_deleted": row[11],
+                "uk_room_l": row[7],
+                "uk_room_p": row[8],
+                "uk_room_t": row[9],
+                "stik": row[10],
+                "elevasi": row[11],
+                "tinggi_vitrase": row[12],
+                "tinggi_lipatan": row[11],
+                "nilai_pembagi": row[12],
+                "created_by": row[13],
+                "created_date": row[14],
+                "updated_by": row[15],
+                "updated_date": row[16],
+                "is_deleted": row[17],
             }
             for row in rows
         ]
