@@ -416,7 +416,7 @@ class ProjectDetilViewSet(viewsets.ViewSet):
                     tinggi_lipatan, nilai_pembagi, username, created_date, username, created_date
                 ])
 
-            return Response({"message": "Project created successfully"}, status=status.HTTP_201_CREATED)
+            return Response({"message": "Project Detil created successfully"}, status=status.HTTP_201_CREATED)
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -631,6 +631,244 @@ class ProjectDetilViewSet(viewsets.ViewSet):
                 "updated_by": row[15],
                 "updated_date": row[16],
                 "is_deleted": row[17],
+            }
+            for row in rows
+        ]
+
+        return Response({
+            "count": total_items,
+            "total_pages": (total_items // page_size) + (1 if total_items % page_size else 0),
+            "current_page": page,
+            "results": data
+        }, status=status.HTTP_200_OK)
+
+##################################################################################################################################################################
+# Detail Item Project 
+class DetilItemViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]  # API hanya bisa diakses oleh user yang login
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
+        ],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'id_project_detil': openapi.Schema(type=openapi.TYPE_INTEGER, description='id Project detil'),
+                'item_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='ID Bahan'),
+                'item_code': openapi.Schema(type=openapi.TYPE_STRING, description='Kode Bahan'),
+                'item_name': openapi.Schema(type=openapi.TYPE_STRING, description='Nama Bahan'),
+                'ukuran': openapi.Schema(type=openapi.TYPE_INTEGER, description='Ukuran Bahan'),
+                'harga_beli': openapi.Schema(type=openapi.TYPE_NUMBER, format="float", description='Harga Beli'),
+                'harga_jual': openapi.Schema(type=openapi.TYPE_NUMBER, format="float", description='Harga Jual'),
+            },
+            required=['id_project_detil']
+        ),
+        responses={201: "Created"}
+    )
+    def create(self, request):
+        """ Create new project detil item """
+        # Ambil data dari body request
+        id_project_detil = request.data.get("id_project_detil")
+        item_id = request.data.get("item_id")
+        item_code = request.data.get("item_code")
+        item_name = request.data.get("item_name")
+        ukuran = request.data.get("ukuran")
+        harga_beli = request.data.get("harga_beli")
+        harga_jual = request.data.get("harga_jual")
+        username = request.user.username  # Username pengguna yang login
+        created_date = now()
+
+        # Validasi input
+        if not (id_project_detil):
+            return Response({"error": "Required fields are missing"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with connections["mysql"].cursor() as cursor:
+                # Masukkan data ke tabel
+                cursor.execute("""
+                    INSERT INTO tb_project_detil_item 
+                    (id_project_detil, item_id, item_code, item_name, ukuran, 
+                    harga_beli, harga_jual, created_by, created_date, updated_by, updated_date, is_deleted)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)
+                """, [
+                    id_project_detil, item_id, item_code, item_name, 
+                    ukuran, harga_beli, harga_jual, username, created_date, username, created_date
+                ])
+
+            return Response({"message": "Detil Item created successfully"}, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def retrieve(self, request, pk=None):
+        """ Mendapatkan detail Item data berdasarkan ID """
+        with connections['mysql'].cursor() as cursor:
+            cursor.execute("SELECT id, id_project_detil, item_id, item_code, item_name, " + 
+                           "ukuran, harga_beli, harga_jual, " + 
+                           "created_by, created_date, updated_by, updated_date, is_deleted " + 
+                           "FROM tb_project_detil_item WHERE id = %s", [pk])
+            row = cursor.fetchone()
+
+        if row:
+            return Response(
+                {
+                    "id": row[0],
+                    "id_project_detil": row[1],
+                    "item_id": row[2],
+                    "item_code": row[3],
+                    "item_name": row[4],
+                    "ukuran": row[5],
+                    "harga_beli": row[6],
+                    "harga_jual": row[7],
+                    "created_by": row[8],
+                    "created_date": row[9],
+                    "updated_by": row[10],
+                    "updated_date": row[11],
+                    "is_deleted": row[12],
+                },
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response({"error": "Data not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
+        ],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['id_project_detil'],
+            properties={
+                'id_project_detil': openapi.Schema(type=openapi.TYPE_INTEGER, description='id Project detil'),
+                'item_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='ID Bahan'),
+                'item_code': openapi.Schema(type=openapi.TYPE_STRING, description='Kode Bahan'),
+                'item_name': openapi.Schema(type=openapi.TYPE_STRING, description='Nama Bahan'),
+                'ukuran': openapi.Schema(type=openapi.TYPE_INTEGER, description='Ukuran Bahan'),
+                'harga_beli': openapi.Schema(type=openapi.TYPE_NUMBER, format="float", description='Harga Beli'),
+                'harga_jual': openapi.Schema(type=openapi.TYPE_NUMBER, format="float", description='Harga Jual'),
+            }
+        ),
+        responses={200: "Updated"},
+    )
+    def update(self, request, pk=None):
+        """ Mengupdate data berdasarkan ID """
+        id_project_detil = request.data.get("id_project_detil")
+        item_id = request.data.get("item_id")
+        item_code = request.data.get("item_code")
+        item_name = request.data.get("item_name")
+        ukuran = request.data.get("ukuran")
+        harga_beli = request.data.get("harga_beli")
+        harga_jual = request.data.get("harga_jual")
+        username = request.user.username  # Username pengguna yang login
+        updated_date = now()
+
+        if not id_project_detil:
+            return Response({"error": "Item Code is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        with connections['mysql'].cursor() as cursor:
+            cursor.execute("""
+                    UPDATE tb_project_detil_item SET id_project_detilr=%s, item_id=%s, item_code=%s, item_name=%s, 
+                        ukuran=%s, harga_beli=%s, harga_jual=%s, updated_by=%s, updated_date=%s
+                    WHERE id=%s
+                """,
+                [id_project_detil, item_id, item_code, item_name, ukuran,  
+                 harga_beli, harga_jual, username, updated_date, pk]
+            )
+
+        return Response({"id": pk, "id_project_detil": id_project_detil, "item_id": item_id, 
+                         "item_code": item_code, "item_name": item_name, "harga_beli": harga_beli,
+                         "harga_jual": harga_jual, "updated_by": username, "updated_date": updated_date}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
+        ],
+        responses={204: "Deleted"},
+    )
+    def destroy(self, request, pk=None):
+        """ Soft Delete: Menandai data sebagai is_deleted = 1 """
+        username = request.user.username  # Username pengguna yang login
+        updated_date = now()
+
+        with connections['mysql'].cursor() as cursor:
+            cursor.execute(
+                "UPDATE tb_project_detil_item SET is_deleted=1, updated_by=%s, updated_date=%s WHERE id=%s",
+                [username, updated_date, pk]
+            )
+
+        return Response({"message": "Soft deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('search', openapi.IN_QUERY, description="Search query", type=openapi.TYPE_STRING),
+            openapi.Parameter('page', openapi.IN_QUERY, description="Page number", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('page_size', openapi.IN_QUERY, description="Page size", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer "),
+        ],
+        responses={200: "Success"}
+    )
+    @action(detail=False, methods=["get"], url_path="search")
+    def search(self, request):
+        """
+        Search data tb_project_detil berdasarkan beberapa field dengan pagination
+        """
+        search_query = request.GET.get("search", "")
+        page = int(request.GET.get("page", 1))
+        page_size = int(request.GET.get("page_size", 10))
+
+        with connections["mysql"].cursor() as cursor:
+            # Hitung total hasil
+            cursor.execute("""
+                SELECT COUNT(*) 
+                FROM tb_project_detil_item
+                WHERE is_deleted = 0 AND (
+                    id_project_detil LIKE %s OR 
+                    item_id LIKE %s OR 
+                    item_code LIKE %s OR 
+                    item_name LIKE %s OR 
+                    created_by LIKE %s OR 
+                    updated_by LIKE %s
+                )
+            """, [f"%{search_query}%", f"%{search_query}%", f"%{search_query}%", f"%{search_query}%",
+                  f"%{search_query}%", f"%{search_query}%"])
+            total_items = cursor.fetchone()[0]
+
+            # Query dengan pagination
+            cursor.execute("""
+                SELECT id, id_project_detil, item_id, item_code, item_name,  
+                    ukuran, harga_beli, harga_jual, created_by, created_date, updated_by, updated_date, is_deleted
+                FROM tb_project_detil_item
+                WHERE is_deleted = 0 AND (
+                    id_project_detil LIKE %s OR 
+                    item_id LIKE %s OR  
+                    item_code LIKE %s OR 
+                    item_name LIKE %s OR 
+                    created_by LIKE %s OR 
+                    updated_by LIKE %s
+                )
+                LIMIT %s OFFSET %s
+            """, [f"%{search_query}%", f"%{search_query}%", f"%{search_query}%",
+                  f"%{search_query}%", f"%{search_query}%", f"%{search_query}%",
+                  page_size, (page - 1) * page_size])
+
+            rows = cursor.fetchall()
+
+        data = [
+            {
+                "id": row[0],
+                "id_project_detil": row[1], 
+                "item_id": row[2], 
+                "item_code": row[3], 
+                "item_name": row[4], 
+                "ukuran": row[5], 
+                "harga_beli": row[6], 
+                "harga_jual": row[7],
+                "created_by": row[8],
+                "created_date": row[9],
+                "updated_by": row[10],
+                "updated_date": row[11],
+                "is_deleted": row[12],
             }
             for row in rows
         ]
