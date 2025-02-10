@@ -701,6 +701,14 @@ class DetilItemViewSet(viewsets.ViewSet):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('id', openapi.IN_PATH, description="ID Detil Item", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
+        ],
+        responses={200: "Success"},
+    )
     def retrieve(self, request, pk=None):
         """ Mendapatkan detail Item data berdasarkan ID """
         with connections['mysql'].cursor() as cursor:
@@ -879,3 +887,53 @@ class DetilItemViewSet(viewsets.ViewSet):
             "current_page": page,
             "results": data
         }, status=status.HTTP_200_OK)
+
+
+@swagger_auto_schema(
+    manual_parameters=[
+        openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail", type=openapi.TYPE_STRING),
+        openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer "),
+    ],
+    responses={200: "Success"}
+)
+@action(detail=False, methods=["get"], url_path="search")
+def searchbyipd(self, request):
+    """
+    Search data tb_project_detil_item berdasarkan id_project_detil
+    """
+    id_project_detil = request.GET.get("id_project_detil", "")
+    
+    if not id_project_detil:
+        return Response({"error": "Parameter id_project_detil is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    with connections["mysql"].cursor() as cursor:
+        # Query data berdasarkan id_project_detil
+        cursor.execute("""
+            SELECT id, id_project_detil, item_id, item_code, item_name,  
+                ukuran, harga_beli, harga_jual, created_by, created_date, updated_by, updated_date, is_deleted
+            FROM tb_project_detil_item
+            WHERE is_deleted = 0 AND id_project_detil = %s
+        """, [id_project_detil])
+
+        rows = cursor.fetchall()
+
+    data = [
+        {
+            "id": row[0],
+            "id_project_detil": row[1],
+            "item_id": row[2],
+            "item_code": row[3],
+            "item_name": row[4],
+            "ukuran": row[5],
+            "harga_beli": row[6],
+            "harga_jual": row[7],
+            "created_by": row[8],
+            "created_date": row[9],
+            "updated_by": row[10],
+            "updated_date": row[11],
+            "is_deleted": row[12],
+        }
+        for row in rows
+    ]
+
+    return Response({"count": len(data), "results": data}, status=status.HTTP_200_OK)
