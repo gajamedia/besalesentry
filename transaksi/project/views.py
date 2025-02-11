@@ -776,7 +776,7 @@ class DetilItemViewSet(viewsets.ViewSet):
 
         with connections['mysql'].cursor() as cursor:
             cursor.execute("""
-                    UPDATE tb_project_detil_item SET id_project_detilr=%s, item_id=%s, item_code=%s, item_name=%s, 
+                    UPDATE tb_project_detil_item SET id_project_detil=%s, item_id=%s, item_code=%s, item_name=%s, 
                         ukuran=%s, harga_beli=%s, harga_jual=%s, updated_by=%s, updated_date=%s
                     WHERE id=%s
                 """,
