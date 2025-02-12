@@ -186,7 +186,7 @@ class ProjectHeaderViewSet(viewsets.ViewSet):
                     WHERE id=%s
                 """,
                 [no_project, tgl_project, ket_project, nama_customer, addr_customer, contact_customer,
-                    status_project, username, updated_date]
+                    status_project, username, updated_date, pk]
             )
 
         return Response({"id": pk, "no_project": no_project, "tgl_project": tgl_project, 
