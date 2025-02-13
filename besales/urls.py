@@ -90,6 +90,7 @@ urlpatterns = [
     path('api/projectdetil/create/', ProjectDetilViewSet.as_view({'post': 'create'}), name='create_project_detil'),
     path('api/projectdetil/<int:pk>/', ProjectDetilViewSet.as_view({'get': 'retrieve'}), name='retrieve_project_detil'),
     path('api/projectdetil/search/', ProjectDetilViewSet.as_view({'get': 'search'}), name='search_project_detil'),
+    path('api/projectdetil/searchbyiph/', ProjectDetilViewSet.as_view({'get': 'searchbyiph'}), name='search_by_id project_header'),
     path('api/projectdetil/<int:pk>/update/', ProjectDetilViewSet.as_view({'put': 'update'}), name='update_project_detil'),
     path('api/projectdetil/<int:pk>/delete/', ProjectDetilViewSet.as_view({'put': 'destroy'}), name='delete_project_detil'),  
     # Detil Item
