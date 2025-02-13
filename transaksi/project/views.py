@@ -642,6 +642,66 @@ class ProjectDetilViewSet(viewsets.ViewSet):
             "results": data
         }, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('id_project_header', openapi.IN_QUERY, description="ID Project Header", type=openapi.TYPE_STRING),
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer "),
+        ],
+        responses={200: "Success"}
+    )
+    @action(detail=False, methods=["get"], url_path="search")
+    def searchbyiph(self, request):
+        """
+        Search data tb_project_detil berdasarkan id_project_header
+        """
+        id_project_header = request.GET.get("id_project_header", "")
+        
+        if not id_project_header:
+            return Response({"error": "Parameter id_project_header is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        with connections["mysql"].cursor() as cursor:
+            # Query data berdasarkan id_project_header
+            cursor.execute("""
+                SELECT id, id_project_header, lebar_bahan, lantai, ruangan, bed, tipe,  
+                    uk_room_l, uk_room_p, uk_room_t, stik, elevasi, tinggi_vitrase, nilai_pembagi,
+                    created_by, created_date, updated_by, updated_date, is_deleted
+                FROM tb_project_detil
+                WHERE is_deleted = 0 AND id_project_header = %s
+            """, [id_project_header])
+
+            rows = cursor.fetchall()
+
+        data = [
+            {
+                "id": row[0],
+                "id_project_header": row[1],
+                "lebar_bahan": row[2],
+                "lantai": row[3],
+                "ruangan": row[4],
+                "bed": row[5],
+                "tipe": row[6],
+                "uk_room_l": row[7],
+                "uk_room_p": row[8],
+                "uk_room_t": row[9],
+                "stik": row[10],
+                "elevasi": row[11],
+                "tinggi_vitrase": row[12],
+                "nilai_pembagi": row[13],
+                "created_by": row[14],
+                "created_date": row[15],
+                "updated_by": row[16],
+                "updated_date": row[17],
+                "is_deleted": row[18],
+            }
+            for row in rows
+        ]
+
+        return Response({"count": len(data), "results": data}, status=status.HTTP_200_OK)
+
+
+
+
+
 ##################################################################################################################################################################
 # Detail Item Project 
 class DetilItemViewSet(viewsets.ViewSet):
