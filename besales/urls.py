@@ -20,6 +20,7 @@ Including another URLconf
 from gettoken.views import TokenViewSet
 from master.views import JenisBahanViewSet, BahanViewSet
 from transaksi.project.views import ProjectHeaderViewSet, ProjectDetilViewSet, DetilItemViewSet
+from transaksi.reporting.views import PenawaranViewSet
 
 from django.contrib import admin
 from django.urls import path, re_path
@@ -82,6 +83,7 @@ urlpatterns = [
     path('api/project/list/', ProjectHeaderViewSet.as_view({'get': 'list'}), name='list_projectheader'),
     path('api/project/create/', ProjectHeaderViewSet.as_view({'post': 'create'}), name='create_project_header'),
     path('api/project/<int:pk>/', ProjectHeaderViewSet.as_view({'get': 'retrieve'}), name='retrieve_projectheader'),
+    path("api/project/retrieveby/", ProjectHeaderViewSet.as_view({'get': 'retrieve_by'}), name="retrieve_by_projectheader"),
     path('api/project/search/', ProjectHeaderViewSet.as_view({'get': 'search'}), name='search_project_header'),
     path('api/project/<int:pk>/update/', ProjectHeaderViewSet.as_view({'put': 'update'}), name='update_project_header'),
     path('api/project/<int:pk>/delete/', ProjectHeaderViewSet.as_view({'put': 'destroy'}), name='delete_project_header'),  
@@ -100,6 +102,9 @@ urlpatterns = [
     path('api/detilbahan/searchbyipd/', DetilItemViewSet.as_view({'get': 'searchbyipd'}), name='search_by_id project_detil'),
     path('api/detilbahan/<int:pk>/update/', DetilItemViewSet.as_view({'put': 'update'}), name='update_project_detil_item'),
     path('api/detilbahan/<int:pk>/delete/', DetilItemViewSet.as_view({'put': 'destroy'}), name='delete_project_detil_item'),  
+
+    # Reporting Project
+    path('api/penawaran/', PenawaranViewSet.as_view({'get': 'penawaran_summary'}), name='report_penawaran_summary'),
 
     # path('api/jenisbahan/retrieve/', TokenViewSet.as_view({'get': 'retrieve'}), name='retrieve_jenisbahan'),
     # path('api/jenisbahan/update/', TokenViewSet.as_view({'put': 'update'}), name='update_jenisbahan'),
