@@ -146,6 +146,56 @@ class ProjectHeaderViewSet(viewsets.ViewSet):
 
     @swagger_auto_schema(
         manual_parameters=[
+            openapi.Parameter('status_project', openapi.IN_QUERY, description="Status Project", type=openapi.TYPE_STRING),
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
+        ],
+        responses={200: "Success"},
+    )
+    @action(detail=False, methods=["get"], url_path="retrieveby")
+    def retrieve_by(self, request):
+        """ Mendapatkan data berdasarkan status_project """
+        status_project = request.GET.get("status_project")
+
+        if not status_project:
+            return Response({"error": "status_project is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        with connections['mysql'].cursor() as cursor:
+            cursor.execute("""
+                SELECT id, no_project, tgl_project, ket_project, nama_customer, 
+                       addr_customer, contact_customer, status_project, 
+                       created_by, created_date, updated_by, updated_date, is_deleted 
+                FROM tb_project_header 
+                WHERE status_project = %s
+            """, [status_project])
+
+            rows = cursor.fetchall()
+
+        if not rows:
+            return Response({"error": "No data found"}, status=status.HTTP_404_NOT_FOUND)
+
+        data = [
+            {
+                "id": row[0],
+                "no_project": row[1],
+                "tgl_project": row[2],
+                "ket_project": row[3],
+                "nama_customer": row[4],
+                "addr_customer": row[5],
+                "contact_customer": row[6],
+                "status_project": row[7],
+                "created_by": row[8],
+                "created_date": row[9],
+                "updated_by": row[10],
+                "updated_date": row[11],
+                "is_deleted": row[12],
+            }
+            for row in rows
+        ]
+
+        return Response({"results": data}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        manual_parameters=[
             openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
         ],
         request_body=openapi.Schema(
