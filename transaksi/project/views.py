@@ -200,7 +200,7 @@ class ProjectHeaderViewSet(viewsets.ViewSet):
                 }
                 for row in rows
             ]
-            return Response({"results": data}, status=status.HTTP_200_OK)
+            return Response({"total_records": len(rows), "results": data}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Data not found"}, status=status.HTTP_404_NOT_FOUND)
 
