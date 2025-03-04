@@ -161,8 +161,9 @@ class ProjectHeaderViewSet(viewsets.ViewSet):
         datefrom = request.GET.get("datefrom")
         dateto = request.GET.get("dateto")
 
-        if not status_project:
-            return Response({"error": "status_project is required"}, status=status.HTTP_400_BAD_REQUEST)
+        # Validasi jika datefrom atau dateto kosong
+        if not datefrom or not dateto:
+            return Response({"error": "datefrom dan dateto harus diisi"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Validasi tanggal
         if datefrom:
@@ -170,14 +171,21 @@ class ProjectHeaderViewSet(viewsets.ViewSet):
         if dateto:
             dateto = parse_date(dateto)
 
-        query = "SELECT id, no_project, tgl_project, ket_project, nama_customer, addr_customer, contact_customer, status_project, created_by, created_date, updated_by, updated_date FROM tb_project_header WHERE status_project = %s"
-        params = [status_project]
+        # Query dasar (tanpa status_project)
+        query = """
+            SELECT id, no_project, tgl_project, ket_project, nama_customer, addr_customer, 
+                contact_customer, status_project, created_by, created_date, updated_by, updated_date 
+            FROM tb_project_header 
+            WHERE created_date BETWEEN %s AND %s
+        """
+        params = [datefrom, dateto]
 
-        # Filter berdasarkan rentang tanggal jika diberikan
-        if datefrom and dateto:
-            query += " AND created_date BETWEEN %s AND %s"
-            params.extend([datefrom, dateto])
+        # Jika status_project diberikan, tambahkan filter
+        if status_project:
+            query += " AND status_project = %s"
+            params.append(status_project)
 
+        # Eksekusi query
         with connections["mysql"].cursor() as cursor:
             cursor.execute(query, params)
             rows = cursor.fetchall()
