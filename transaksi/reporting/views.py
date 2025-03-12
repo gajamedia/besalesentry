@@ -20,19 +20,18 @@ class PenawaranViewSet(viewsets.ViewSet):
     )
     def penawaran_summary(self, request):
         """ API untuk menampilkan data penawaran berdasarkan ID Project """
-        id_project = request.GET.get("id_project")
+        id_project_header = request.GET.get("id_project_header")
 
-        if not id_project:
-            return Response({"error": "id_project is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not id_project_header:
+            return Response({"error": "id_project_heaader is required"}, status=status.HTTP_400_BAD_REQUEST)
         
         with connections["mysql"].cursor() as cursor:
             # Ambil data project header
             cursor.execute("""
-                SELECT ph.id, ph.no_project, ph.tgl_project, ph.ket_project, ph.nama_customer, ph.status_project, pc.addr_customer
+                SELECT ph.id, ph.no_project, ph.tgl_project, ph.ket_project, ph.nama_customer, ph.status_project, ph.addr_customer
                 FROM tb_project_header ph
-                LEFT JOIN tb_project_customer pc ON ph.id = pc.id_project_header
                 WHERE ph.id = %s
-            """, [id_project])
+            """, [id_project_header])
             project = cursor.fetchone()
 
             if not project:
@@ -51,10 +50,10 @@ class PenawaranViewSet(viewsets.ViewSet):
             # Ambil data project detil
             cursor.execute("""
                 SELECT id, lebar_bahan, lantai, ruangan, bed, tipe, 
-                       uk_room_l, uk_room_p, uk_room_t, stik, elevasi, tingg_vitrase, nilai_pembagi, tinggi_lipatan
+                       uk_room_l, uk_room_p, uk_room_t, stik, elevasi, tinggi_vitrase, nilai_pembagi, tinggi_lipatan
                 FROM tb_project_detil
                 WHERE id_project_header = %s
-            """, [id_project])
+            """, [id_project_header])
             project_details = cursor.fetchall()
 
             if not project_details:
