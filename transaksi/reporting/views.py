@@ -83,25 +83,28 @@ class PenawaranViewSet(viewsets.ViewSet):
                     tinggi_kain = tinggi_gorden - detail[11]
                     panel = lebar_gorden / detail[12]
 
+                    print ("id_detail: ", id_detail)
                     # Ambil item terkait
+                        # JOIN tb_bahan bi ON pdi.item_id = bi.id
+                        # JOIN tb_jenisbahan jb ON bi.id_jenis = jb.id
+                        #, jb.nama_jenis
                     cursor.execute("""
-                        SELECT bi.item_code, bi.ukuran, bi.harga_beli, bi.harga_jual, jb.nama_jenis
+                        SELECT pdi.item_code, pdi.ukuran, pdi.harga_beli, pdi.harga_jual, pdi.item_name
                         FROM tb_project_detil_item pdi
-                        JOIN tb_bahan bi ON pdi.item_id = bi.id
-                        JOIN tb_jenisbahan jb ON bi.id_jenis = jb.id
                         WHERE pdi.id_project_detil = %s
                     """, [id_detail])
                     items = cursor.fetchall()
 
                     item_data = []
                     for item in items:
+                        print ("isi items[]: ", item[0])
                         volume = ((tinggi_gorden + tinggi_lipatan) * panel) / 100
                         item_data.append({
                             "item_code": item[0],
                             "ukuran": item[1],
                             "harga_beli": item[2],
                             "harga_jual": item[3],
-                            "jenis_bahan": item[4],
+                            "item_name": item[4],
                             "volume": volume
                         })
 
