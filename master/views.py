@@ -499,7 +499,7 @@ class BahanViewSet(ViewSet):
     def update(self, request, pk=None):
         """ Mengupdate data berdasarkan ID """
         item_code = request.data.get("item_code")
-        item_name = request.data.get("item_nama")
+        item_name = request.data.get("item_name")
         id_jenis = request.data.get("id_jenis")
         ukuran = request.data.get("ukuran")
         keterangan = request.data.get("keterangan")
