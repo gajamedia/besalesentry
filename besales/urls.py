@@ -21,6 +21,7 @@ from gettoken.views import TokenViewSet
 from master.views import JenisBahanViewSet, BahanViewSet
 from transaksi.project.views import ProjectHeaderViewSet, ProjectDetilViewSet, DetilItemViewSet
 from transaksi.reporting.views import PenawaranViewSet
+from transaksi.other.views import OtherViewSet
 
 from django.contrib import admin
 from django.urls import path, re_path
@@ -105,6 +106,9 @@ urlpatterns = [
 
     # Reporting Project
     path('api/penawaran/', PenawaranViewSet.as_view({'get': 'penawaran_summary'}), name='report_penawaran_summary'),
+
+    # Other
+    path('api/totalkain/', OtherViewSet.as_view({'get': 'kebutuhan_kain'}), name='hitung_kebutuhan_kain'),
 
     # path('api/jenisbahan/retrieve/', TokenViewSet.as_view({'get': 'retrieve'}), name='retrieve_jenisbahan'),
     # path('api/jenisbahan/update/', TokenViewSet.as_view({'put': 'update'}), name='update_jenisbahan'),
