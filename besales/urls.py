@@ -109,6 +109,8 @@ urlpatterns = [
 
     # Other
     path('api/totalkain/', OtherViewSet.as_view({'get': 'kebutuhan_kain'}), name='hitung_kebutuhan_kain'),
+    path('api/totalvitrase/', OtherViewSet.as_view({'get': 'kebutuhan_vitrase'}), name='hitung_kebutuhan_vitrase'),
+
 
     # path('api/jenisbahan/retrieve/', TokenViewSet.as_view({'get': 'retrieve'}), name='retrieve_jenisbahan'),
     # path('api/jenisbahan/update/', TokenViewSet.as_view({'put': 'update'}), name='update_jenisbahan'),
