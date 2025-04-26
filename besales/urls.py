@@ -103,6 +103,8 @@ urlpatterns = [
     path('api/detilbahan/searchbyipd/', DetilItemViewSet.as_view({'get': 'searchbyipd'}), name='search_by_id project_detil'),
     path('api/detilbahan/<int:pk>/update/', DetilItemViewSet.as_view({'put': 'update'}), name='update_project_detil_item'),
     path('api/detilbahan/<int:pk>/delete/', DetilItemViewSet.as_view({'put': 'destroy'}), name='delete_project_detil_item'),  
+    path('api/detilbahan/<int:pk>/harddelete/', DetilItemViewSet.as_view({'delete': 'delete'}), name='delete_project_detil_item'),
+
 
     # Reporting Project
     path('api/penawaran/', PenawaranViewSet.as_view({'get': 'penawaran_summary'}), name='report_penawaran_summary'),
