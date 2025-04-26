@@ -937,6 +937,27 @@ class DetilItemViewSet(viewsets.ViewSet):
 
     @swagger_auto_schema(
         manual_parameters=[
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer ")
+        ],
+        responses={204: "Deleted"},
+    )
+    def delete(self, request, pk=None):
+        """ Hard Delete: Menghapus data dari database """
+        with connections['mysql'].cursor() as cursor:
+            cursor.execute("SELECT id FROM tb_project_detil_item WHERE id = %s", [pk])
+            row = cursor.fetchone()
+            if not row:
+                return Response({"error": "Data not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            cursor.execute(
+                "DELETE FROM tb_project_detil_item WHERE id = %s",
+                [pk]
+            )
+
+        return Response({"message": "Permanent Deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+    @swagger_auto_schema(
+        manual_parameters=[
             openapi.Parameter('search', openapi.IN_QUERY, description="Search query", type=openapi.TYPE_STRING),
             openapi.Parameter('page', openapi.IN_QUERY, description="Page number", type=openapi.TYPE_INTEGER),
             openapi.Parameter('page_size', openapi.IN_QUERY, description="Page size", type=openapi.TYPE_INTEGER),
