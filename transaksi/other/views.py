@@ -6,6 +6,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.utils.timezone import now
 from rest_framework.decorators import action
+import math
 
 class OtherViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]  # API hanya bisa diakses oleh user yang login
@@ -60,7 +61,7 @@ class OtherViewSet(viewsets.ViewSet):
                 tinggi_gorden = uk_room_t - elevasi
                 tinggi_kain = (tinggi_gorden - tinggi_vitrase) + tinggi_lipatan
                 lebar_total = uk_room_l + uk_room_p
-                panel = lebar_total / nilai_pembagi
+                panel = math.ceil(lebar_total / nilai_pembagi)
 
                 kebutuhan = (tinggi_kain * panel) / 100
 
@@ -123,7 +124,7 @@ class OtherViewSet(viewsets.ViewSet):
                 tinggi_lipatan = detil[10]
 
                 lebar_total = uk_room_l + uk_room_p
-                panel = lebar_total / nilai_pembagi
+                panel = math.ceil(lebar_total / nilai_pembagi)
 
                 kebutuhan = ((tinggi_vitrase + tinggi_lipatan) * panel) / 100
                 kebutuhan_total += kebutuhan
