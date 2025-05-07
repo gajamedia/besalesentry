@@ -731,7 +731,7 @@ class ProjectDetilViewSet(viewsets.ViewSet):
             # Query data berdasarkan id_project_header
             cursor.execute("""
                 SELECT id, id_project_header, lebar_bahan, lantai, ruangan, bed, tipe,  
-                    uk_room_l, uk_room_p, uk_room_t, stik, elevasi, tinggi_vitrase, nilai_pembagi,
+                    uk_room_l, uk_room_p, uk_room_t, stik, elevasi, tinggi_vitrase, tinggi_lipatan, nilai_pembagi,
                     created_by, created_date, updated_by, updated_date, is_deleted
                 FROM tb_project_detil
                 WHERE is_deleted = 0 AND id_project_header = %s
@@ -754,12 +754,13 @@ class ProjectDetilViewSet(viewsets.ViewSet):
                 "stik": row[10],
                 "elevasi": row[11],
                 "tinggi_vitrase": row[12],
-                "nilai_pembagi": row[13],
-                "created_by": row[14],
-                "created_date": row[15],
-                "updated_by": row[16],
-                "updated_date": row[17],
-                "is_deleted": row[18],
+                "tinggi_lipatan": row[13],
+                "nilai_pembagi": row[14],
+                "created_by": row[15],
+                "created_date": row[16],
+                "updated_by": row[17],
+                "updated_date": row[18],
+                "is_deleted": row[19],
             }
             for row in rows
         ]
