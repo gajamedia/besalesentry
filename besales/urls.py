@@ -110,8 +110,8 @@ urlpatterns = [
     path('api/penawaran/', PenawaranViewSet.as_view({'get': 'penawaran_summary'}), name='report_penawaran_summary'),
 
     # Other
-    path('api/totalkain/', OtherViewSet.as_view({'get': 'kebutuhan_kain'}), name='hitung_kebutuhan_kain'),
-    path('api/totalvitrase/', OtherViewSet.as_view({'get': 'kebutuhan_vitrase'}), name='hitung_kebutuhan_vitrase'),
+    path('api/totalkainsplit/', OtherViewSet.as_view({'get': 'kebutuhan_kain'}), name='hitung_kebutuhan_kain'),
+    path('api/totalkainvitrase/', OtherViewSet.as_view({'get': 'kebutuhan_vitrase'}), name='hitung_kebutuhan_vitrase'),
 
 
     # path('api/jenisbahan/retrieve/', TokenViewSet.as_view({'get': 'retrieve'}), name='retrieve_jenisbahan'),
