@@ -42,7 +42,7 @@ class OtherViewSet(viewsets.ViewSet):
             if not detils:
                 return Response({"error": "Data detil tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
 
-            kebutuhan_total = 0
+            kebutuhan_total_kain_split = 0
             detail_list = []
 
             for detil in detils:
@@ -59,13 +59,20 @@ class OtherViewSet(viewsets.ViewSet):
 
                 # Hitung kebutuhan kain
                 tinggi_gorden = uk_room_t - elevasi
-                tinggi_kain = (tinggi_gorden - tinggi_vitrase) + tinggi_lipatan
+                # tinggi_kain = (tinggi_gorden - tinggi_vitrase) + tinggi_lipatan
+                if tinggi_lipatan==25:
+                    tinggi_kain = tinggi_gorden + tinggi_lipatan
+                else:
+                    tinggi_kain = tinggi_gorden + (tinggi_lipatan/2)
                 lebar_total = uk_room_l + uk_room_p
                 panel = math.ceil(lebar_total / nilai_pembagi)
 
-                kebutuhan = (tinggi_kain * panel) / 100
+                kebutuhan_kain_split = (tinggi_kain * panel) / 100
+                # kebutuhan_kain_vitrase = (tinggi_vitrase * panel) / 100
+                # kebutuhan = tinggi_kain * panel
 
-                kebutuhan_total += kebutuhan
+                kebutuhan_total_kain_split += kebutuhan_kain_split
+                # kebutuhan_total_kain_vitrase += kebutuhan_kain_vitrase
 
                 detail_list.append({
                     # "lantai": lantai,
@@ -73,11 +80,11 @@ class OtherViewSet(viewsets.ViewSet):
                     "tinggi_kain": tinggi_kain,
                     "lebar_total": lebar_total,
                     "panel": panel,
-                    "kebutuhan_kain": kebutuhan
+                    "kebutuhan_kain_split": kebutuhan_kain_split
                 })
 
         return Response({
-            "total_kebutuhan_kain": round(kebutuhan_total, 2),
+            "total_kebutuhan_kain_split": round(kebutuhan_total_kain_split, 2),
             "details": detail_list
         }, status=status.HTTP_200_OK)
     
@@ -114,6 +121,7 @@ class OtherViewSet(viewsets.ViewSet):
                 return Response({"error": "Data detil tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
 
             kebutuhan_total = 0
+            kebutuhan = 0
             detail_list = []
 
             for detil in detils:
@@ -126,7 +134,10 @@ class OtherViewSet(viewsets.ViewSet):
                 lebar_total = uk_room_l + uk_room_p
                 panel = math.ceil(lebar_total / nilai_pembagi)
 
-                kebutuhan = ((tinggi_vitrase + tinggi_lipatan) * panel) / 100
+                if tinggi_lipatan==30:
+                    tinggi_lipatan = tinggi_lipatan/2
+                    kebutuhan = ((tinggi_vitrase + tinggi_lipatan) * panel) / 100
+
                 kebutuhan_total += kebutuhan
 
                 detail_list.append({
@@ -134,10 +145,10 @@ class OtherViewSet(viewsets.ViewSet):
                     "tinggi_lipatan": tinggi_lipatan,
                     "lebar_total": lebar_total,
                     "panel": panel,
-                    "kebutuhan_vitrase": kebutuhan
+                    "kebutuhan_kain_vitrase": kebutuhan
                 })
 
         return Response({
-            "total_kebutuhan_vitrase": round(kebutuhan_total, 2),
+            "total_kebutuhan_kain_vitrase": round(kebutuhan_total, 2),
             "details": detail_list
         }, status=status.HTTP_200_OK)
