@@ -59,15 +59,20 @@ class OtherViewSet(viewsets.ViewSet):
 
                 # Hitung kebutuhan kain
                 tinggi_gorden = uk_room_t - elevasi
-                # tinggi_kain = (tinggi_gorden - tinggi_vitrase) + tinggi_lipatan
-                if tinggi_lipatan==25:
-                    tinggi_kain = tinggi_gorden + tinggi_lipatan
-                else:
-                    tinggi_kain = tinggi_gorden + (tinggi_lipatan/2)
                 lebar_total = uk_room_l + uk_room_p
                 panel = math.ceil(lebar_total / nilai_pembagi)
 
-                kebutuhan_kain_split = (tinggi_kain * panel) / 100
+                # Volume Kain
+                volume_kain = ((tinggi_gorden + tinggi_lipatan) * panel)/100
+
+                tinggi_kain = (tinggi_gorden - tinggi_vitrase)
+
+                if tinggi_lipatan==25:
+                    kain = (tinggi_gorden - tinggi_vitrase) + tinggi_lipatan
+                else:
+                    kain = (tinggi_gorden - tinggi_vitrase) + (tinggi_lipatan/2)
+
+                kebutuhan_kain_split = (kain * panel) / 100
                 # kebutuhan_kain_vitrase = (tinggi_vitrase * panel) / 100
                 # kebutuhan = tinggi_kain * panel
 
@@ -80,6 +85,11 @@ class OtherViewSet(viewsets.ViewSet):
                     "tinggi_kain": tinggi_kain,
                     "lebar_total": lebar_total,
                     "panel": panel,
+                    "volume_kain": volume_kain,
+                    "elevasi": elevasi,
+                    "tinggivitrase": tinggi_vitrase,
+                    "tinggiruangan": uk_room_t,
+                    "tinggilipatan": tinggi_lipatan,
                     "kebutuhan_kain_split": kebutuhan_kain_split
                 })
 
