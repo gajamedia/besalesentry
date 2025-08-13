@@ -116,6 +116,9 @@ urlpatterns = [
 
     # kebutuhan item rel
     path('api/totalrel/', RelViewSet.as_view({'get': 'kebutuhan_rel'}), name='hitung_kebutuhan_rel'),
+    path('api/totalroda/', RelViewSet.as_view({'get': 'kebutuhan_roda'}), name='hitung_kebutuhan_roda'),
+    path('api/totalbracketl/', RelViewSet.as_view({'get': 'kebutuhan_bracketl'}), name='hitung_kebutuhan_bracketl'),
+    path('api/totalbrackets/', RelViewSet.as_view({'get': 'kebutuhan_brackets'}), name='hitung_kebutuhan_brackets'),
 
 
     # path('api/jenisbahan/retrieve/', TokenViewSet.as_view({'get': 'retrieve'}), name='retrieve_jenisbahan'),
