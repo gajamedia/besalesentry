@@ -288,3 +288,75 @@ class RelViewSet(viewsets.ViewSet):
             "harga_brackets": round(harga_total_brackets, 2)
         }, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer "),
+            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING),
+            openapi.Parameter('qty_bracketl', openapi.IN_QUERY, description="Qty Bracket L", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('qty_brackets', openapi.IN_QUERY, description="Qty Bracket S", type=openapi.TYPE_INTEGER)
+        ],
+        responses={200: "Success"}
+    )
+    def kebutuhan_stik(self, request):
+        """ Menghitung total kebutuhan Bracket L untuk semua detil project """
+        id_project_detil = request.GET.get("id_project_detil")
+        item_code = request.GET.get("item_code")
+        qty_bracketl = request.GET.get("qty_bracketl")
+        qty_brackets = request.GET.get("qty_brackets")
+
+        with connections["mysql"].cursor() as cursor:
+            if id_project_detil:
+                cursor.execute("""
+                    SELECT id, lebar_bahan, lantai, ruangan, 
+                        uk_room_l, uk_room_p, uk_room_t, elevasi, tinggi_vitrase, nilai_pembagi, tinggi_lipatan
+                    FROM tb_project_detil
+                    WHERE id = %s
+                """, [id_project_detil])
+            else:
+                cursor.execute("""
+                    SELECT id, lebar_bahan, lantai, ruangan, 
+                        uk_room_l, uk_room_p, uk_room_t, elevasi, tinggi_vitrase, nilai_pembagi, tinggi_lipatan
+                    FROM tb_project_detil
+                """)
+
+            detils = cursor.fetchall()
+
+            if not detils:
+                return Response({"error": "Data detil tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
+
+            kebutuhan_qty_stik = 0
+
+            for detil in detils:
+                # uk_room_l = detil[4]
+                # uk_room_p = detil[5]
+                # nilai_pembagi = detil[9]
+
+                # lebar_total = uk_room_l + uk_room_p
+                # panel = math.ceil(lebar_total / nilai_pembagi)
+
+
+                # kebutuhan_qty_rel += kebutuhan_qty_rel
+                kebutuhan_qty_stik += (qty_bracketl + qty_brackets)
+
+        # Ambil harga jual dari tb_bahan
+        harga_satuan = 0
+        if item_code:
+            with connections["mysql"].cursor() as cursor:
+                cursor.execute("""
+                    SELECT harga_jual 
+                    FROM tb_bahan
+                    WHERE item_code = %s
+                    LIMIT 1
+                """, [item_code])
+                row = cursor.fetchone()
+                if row:
+                    harga_satuan = row[0]
+
+        # Hitung harga total rel
+        harga_total_stik = kebutuhan_qty_stik * harga_satuan
+
+        return Response({
+            "total_qty_stik": round(kebutuhan_qty_stik, 2),
+            "harga_stik": round(harga_total_stik, 2)
+        }, status=status.HTTP_200_OK)
