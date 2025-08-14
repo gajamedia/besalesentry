@@ -120,6 +120,10 @@ urlpatterns = [
     path('api/totalbracketl/', RelViewSet.as_view({'get': 'kebutuhan_bracketl'}), name='hitung_kebutuhan_bracketl'),
     path('api/totalbrackets/', RelViewSet.as_view({'get': 'kebutuhan_brackets'}), name='hitung_kebutuhan_brackets'),
     path('api/totalstik/', RelViewSet.as_view({'get': 'kebutuhan_stik'}), name='hitung_kebutuhan_stik'),
+    path('api/totalbracketceiling/', RelViewSet.as_view({'get': 'kebutuhan_bracket_ceiling'}), name='hitung_kebutuhan_bracketceiling'),
+    path('api/totalfisher/', RelViewSet.as_view({'get': 'kebutuhan_fisher'}), name='hitung_kebutuhan_fisher'),
+    path('api/totalgalvanis24/', RelViewSet.as_view({'get': 'kebutuhan_galvanis24'}), name='hitung_kebutuhan_galvanis24'),
+    path('api/jasapasang/', RelViewSet.as_view({'get': 'jasa_pasang'}), name='hitung_jasa_pasang'),
 
 
     # path('api/jenisbahan/retrieve/', TokenViewSet.as_view({'get': 'retrieve'}), name='retrieve_jenisbahan'),
