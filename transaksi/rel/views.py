@@ -14,8 +14,8 @@ class RelViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer "),
-            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER),
-            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING)
+            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER, default=0),
+            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING, default="0")
         ],
         responses={200: "Success"}
     )
@@ -23,6 +23,16 @@ class RelViewSet(viewsets.ViewSet):
         """ Menghitung total kebutuhan rel untuk semua detil project """
         id_project_detil = request.GET.get("id_project_detil")
         item_code = request.GET.get("item_code")
+
+        # === VALIDASI INPUT ===
+        errors = {}
+        if not id_project_detil or id_project_detil == "0":
+            errors["id_project_detil"] = "id_project_detil harus diisi dan tidak boleh 0"
+        if not item_code:
+            errors["item_code"] = "item_code harus diisi"
+        if errors:
+            errors["code"] = "99"
+            return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
 
         with connections["mysql"].cursor() as cursor:
             if id_project_detil:
@@ -42,7 +52,7 @@ class RelViewSet(viewsets.ViewSet):
             detils = cursor.fetchall()
 
             if not detils:
-                return Response({"error": "Data detil tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Data detil tidak ditemukan", "code":"4"}, status=status.HTTP_404_NOT_FOUND)
 
             kebutuhan_qty_rel = 0
 
@@ -78,8 +88,8 @@ class RelViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer "),
-            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER),
-            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING)
+            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER, default=0),
+            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING, default="0")
         ],
         responses={200: "Success"}
     )
@@ -87,6 +97,17 @@ class RelViewSet(viewsets.ViewSet):
         """ Menghitung total kebutuhan roda untuk semua detil project """
         id_project_detil = request.GET.get("id_project_detil")
         item_code = request.GET.get("item_code")
+
+        # === VALIDASI INPUT ===
+        errors = {}
+        if not id_project_detil:
+            errors["id_project_detil"] = "id_project_detil harus diisi"
+        if not item_code:
+            errors["item_code"] = "item_code harus diisi"
+        if errors:
+            errors["code"] = "99"
+            return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
+
 
         with connections["mysql"].cursor() as cursor:
             if id_project_detil:
@@ -106,7 +127,7 @@ class RelViewSet(viewsets.ViewSet):
             detils = cursor.fetchall()
 
             if not detils:
-                return Response({"error": "Data detil tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Data detil tidak ditemukan", "code":"4"}, status=status.HTTP_404_NOT_FOUND)
 
             kebutuhan_qty_roda = 0
 
@@ -147,9 +168,9 @@ class RelViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer "),
-            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER, default=0),
             openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING),
-            openapi.Parameter('qty_curved45', openapi.IN_QUERY, description="Qty Curved45", type=openapi.TYPE_INTEGER)
+            openapi.Parameter('qty_curved45', openapi.IN_QUERY, description="Qty Curved45", type=openapi.TYPE_INTEGER, default=0)
         ],
         responses={200: "Success"}
     )
@@ -158,6 +179,18 @@ class RelViewSet(viewsets.ViewSet):
         id_project_detil = request.GET.get("id_project_detil")
         item_code = request.GET.get("item_code")
         qty_curved45 = request.GET.get("qty_curved45")
+
+        # === VALIDASI INPUT ===
+        errors = {}
+        if not id_project_detil:
+            errors["id_project_detil"] = "id_project_detil harus diisi"
+        if not item_code:
+            errors["item_code"] = "item_code harus diisi"
+        if not qty_curved45:
+            errors["qty_curved45"] = "qty_curved45 harus diisi"
+        if errors:
+            errors["code"] = "99"
+            return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
 
         with connections["mysql"].cursor() as cursor:
             if id_project_detil:
@@ -177,7 +210,7 @@ class RelViewSet(viewsets.ViewSet):
             detils = cursor.fetchall()
 
             if not detils:
-                return Response({"error": "Data detil tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Data detil tidak ditemukan", "code":"4"}, status=status.HTTP_404_NOT_FOUND)
 
             kebutuhan_qty_bracketl = 0
 
@@ -218,10 +251,10 @@ class RelViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer "),
-            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER),
-            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING),
-            openapi.Parameter('l', openapi.IN_QUERY, description="L", type=openapi.TYPE_INTEGER),
-            openapi.Parameter('p', openapi.IN_QUERY, description="P", type=openapi.TYPE_INTEGER)
+            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER, default=0),
+            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING, default="0"),
+            openapi.Parameter('l', openapi.IN_QUERY, description="L", type=openapi.TYPE_INTEGER, default=0),
+            openapi.Parameter('p', openapi.IN_QUERY, description="P", type=openapi.TYPE_INTEGER, default=0)
         ],
         responses={200: "Success"}
     )
@@ -231,6 +264,18 @@ class RelViewSet(viewsets.ViewSet):
         item_code = request.GET.get("item_code")
         l = request.GET.get("l")
         p = request.GET.get("p")
+
+        # === VALIDASI INPUT ===
+        errors = {}
+        if not id_project_detil:
+            errors["id_project_detil"] = "id_project_detil harus diisi"
+        if not item_code:
+            errors["item_code"] = "item_code harus diisi"
+        if not l or not p:
+            errors["lp"] = "l dan p harus diisi"
+        if errors:
+            errors["code"] = "99"
+            return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
 
         with connections["mysql"].cursor() as cursor:
             if id_project_detil:
@@ -250,7 +295,7 @@ class RelViewSet(viewsets.ViewSet):
             detils = cursor.fetchall()
 
             if not detils:
-                return Response({"error": "Data detil tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Data detil tidak ditemukan", "code":"4"}, status=status.HTTP_404_NOT_FOUND)
 
             kebutuhan_qty_brackets = 0
 
@@ -291,10 +336,10 @@ class RelViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer "),
-            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER),
-            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING),
-            openapi.Parameter('qty_bracketl', openapi.IN_QUERY, description="Qty Bracket L", type=openapi.TYPE_INTEGER),
-            openapi.Parameter('qty_brackets', openapi.IN_QUERY, description="Qty Bracket S", type=openapi.TYPE_INTEGER)
+            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER, default=0),
+            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING, default="0"),
+            openapi.Parameter('qty_bracketl', openapi.IN_QUERY, description="Qty Bracket L", type=openapi.TYPE_INTEGER, default=0),
+            openapi.Parameter('qty_brackets', openapi.IN_QUERY, description="Qty Bracket S", type=openapi.TYPE_INTEGER, default=0)
         ],
         responses={200: "Success"}
     )
@@ -304,6 +349,18 @@ class RelViewSet(viewsets.ViewSet):
         item_code = request.GET.get("item_code")
         qty_bracketl = request.GET.get("qty_bracketl")
         qty_brackets = request.GET.get("qty_brackets")
+
+        # === VALIDASI INPUT ===
+        errors = {}
+        if not id_project_detil:
+            errors["id_project_detil"] = "id_project_detil harus diisi"
+        if not item_code:
+            errors["item_code"] = "item_code harus diisi"
+        if not qty_bracketl or not qty_brackets:
+            errors["qty_bracket_ls"] = "qty bracket l dan s harus diisi"
+        if errors:
+            errors["code"] = "99"
+            return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
 
         with connections["mysql"].cursor() as cursor:
             if id_project_detil:
@@ -323,7 +380,7 @@ class RelViewSet(viewsets.ViewSet):
             detils = cursor.fetchall()
 
             if not detils:
-                return Response({"error": "Data detil tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Data detil tidak ditemukan", "code":"4"}, status=status.HTTP_404_NOT_FOUND)
 
             kebutuhan_qty_stik = 0
 
@@ -364,8 +421,8 @@ class RelViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer "),
-            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER),
-            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING)
+            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER, default=0),
+            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING, default="0")
         ],
         responses={200: "Success"}
     )
@@ -373,6 +430,16 @@ class RelViewSet(viewsets.ViewSet):
         """ Menghitung total kebutuhan Bracket L untuk semua detil project """
         id_project_detil = request.GET.get("id_project_detil")
         item_code = request.GET.get("item_code")
+
+        # === VALIDASI INPUT ===
+        errors = {}
+        if not id_project_detil:
+            errors["id_project_detil"] = "id_project_detil harus diisi"
+        if not item_code:
+            errors["item_code"] = "item_code harus diisi"
+        if errors:
+            errors["code"] = "99"
+            return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
 
         with connections["mysql"].cursor() as cursor:
             if id_project_detil:
@@ -392,7 +459,7 @@ class RelViewSet(viewsets.ViewSet):
             detils = cursor.fetchall()
 
             if not detils:
-                return Response({"error": "Data detil tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Data detil tidak ditemukan", "code":"4"}, status=status.HTTP_404_NOT_FOUND)
 
             kebutuhan_qty_bracket_ceiling = 0
 
@@ -433,8 +500,8 @@ class RelViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer "),
-            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER),
-            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING)
+            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER, default=0),
+            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING, default="0")
         ],
         responses={200: "Success"}
     )
@@ -442,6 +509,16 @@ class RelViewSet(viewsets.ViewSet):
         """ Menghitung total kebutuhan Bracket L untuk semua detil project """
         id_project_detil = request.GET.get("id_project_detil")
         item_code = request.GET.get("item_code")
+
+        # === VALIDASI INPUT ===
+        errors = {}
+        if not id_project_detil:
+            errors["id_project_detil"] = "id_project_detil harus diisi"
+        if not item_code:
+            errors["item_code"] = "item_code harus diisi"
+        if errors:
+            errors["code"] = "99"
+            return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
 
         with connections["mysql"].cursor() as cursor:
             if id_project_detil:
@@ -461,7 +538,7 @@ class RelViewSet(viewsets.ViewSet):
             detils = cursor.fetchall()
 
             if not detils:
-                return Response({"error": "Data detil tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Data detil tidak ditemukan", "code":"4"}, status=status.HTTP_404_NOT_FOUND)
 
             kebutuhan_qty_fisher = 0
 
@@ -502,8 +579,8 @@ class RelViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer "),
-            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER),
-            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING)
+            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER, default=0),
+            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING, default="0")
         ],
         responses={200: "Success"}
     )
@@ -511,6 +588,16 @@ class RelViewSet(viewsets.ViewSet):
         """ Menghitung total kebutuhan rel untuk semua detil project """
         id_project_detil = request.GET.get("id_project_detil")
         item_code = request.GET.get("item_code")
+
+        # === VALIDASI INPUT ===
+        errors = {}
+        if not id_project_detil:
+            errors["id_project_detil"] = "id_project_detil harus diisi"
+        if not item_code:
+            errors["item_code"] = "item_code harus diisi"
+        if errors:
+            errors["code"] = "99"
+            return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
 
         with connections["mysql"].cursor() as cursor:
             if id_project_detil:
@@ -530,7 +617,7 @@ class RelViewSet(viewsets.ViewSet):
             detils = cursor.fetchall()
 
             if not detils:
-                return Response({"error": "Data detil tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Data detil tidak ditemukan", "code":"4"}, status=status.HTTP_404_NOT_FOUND)
 
             kebutuhan_qty_galvanis24 = 0
 
@@ -566,8 +653,8 @@ class RelViewSet(viewsets.ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer "),
-            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER),
-            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING)
+            openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER, default=0),
+            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING, default="0")
         ],
         responses={200: "Success"}
     )
@@ -575,6 +662,16 @@ class RelViewSet(viewsets.ViewSet):
         """ Menghitung total kebutuhan rel untuk semua detil project """
         id_project_detil = request.GET.get("id_project_detil")
         item_code = request.GET.get("item_code")
+
+        # === VALIDASI INPUT ===
+        errors = {}
+        if not id_project_detil:
+            errors["id_project_detil"] = "id_project_detil harus diisi"
+        if not item_code:
+            errors["item_code"] = "item_code harus diisi"
+        if errors:
+            errors["code"] = "99"
+            return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
 
         with connections["mysql"].cursor() as cursor:
             if id_project_detil:
@@ -594,7 +691,7 @@ class RelViewSet(viewsets.ViewSet):
             detils = cursor.fetchall()
 
             if not detils:
-                return Response({"error": "Data detil tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Data detil tidak ditemukan", "code":"4"}, status=status.HTTP_404_NOT_FOUND)
 
             jasa_pasang_qty = 0
 
