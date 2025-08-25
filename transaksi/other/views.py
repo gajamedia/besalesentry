@@ -62,7 +62,8 @@ class OtherViewSet(viewsets.ViewSet):
                 tinggi_gorden = uk_room_t - elevasi
                 lebar_total = uk_room_l + uk_room_p
                 panel = math.ceil(lebar_total / nilai_pembagi)
-                tinggi_kain = (tinggi_gorden - tinggi_vitrase) - stik
+                tinggi_kain = (tinggi_gorden - tinggi_vitrase)
+                tinggi_kain2 = (tinggi_gorden - stik)
 
                 # Volume Kain
                 volume_kain = ((tinggi_gorden + tinggi_lipatan) * panel)/100
@@ -90,7 +91,8 @@ class OtherViewSet(viewsets.ViewSet):
                     # "tinggivitrase": tinggi_vitrase,
                     # "tinggiruangan": uk_room_t,
                     # "tinggilipatan": tinggi_lipatan,
-                    "kebutuhan_kain_split": kebutuhan_kain_split
+                    "kebutuhan_kain_split": kebutuhan_kain_split,
+                    "tinggi_kain2": tinggi_kain2
                 })
 
         return Response({
