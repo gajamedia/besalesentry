@@ -790,6 +790,7 @@ class DetilItemViewSet(viewsets.ViewSet):
                 'ukuran': openapi.Schema(type=openapi.TYPE_INTEGER, description='Ukuran Bahan'),
                 'harga_beli': openapi.Schema(type=openapi.TYPE_NUMBER, format="float", description='Harga Beli'),
                 'harga_jual': openapi.Schema(type=openapi.TYPE_NUMBER, format="float", description='Harga Jual'),
+                'qty': openapi.Schema(type=openapi.TYPE_NUMBER, format="float", description='Qty')
             },
             required=['id_project_detil']
         ),
@@ -805,6 +806,7 @@ class DetilItemViewSet(viewsets.ViewSet):
         ukuran = request.data.get("ukuran")
         harga_beli = request.data.get("harga_beli")
         harga_jual = request.data.get("harga_jual")
+        qty = request.data.get("qty")
         username = request.user.username  # Username pengguna yang login
         created_date = now()
 
@@ -818,11 +820,11 @@ class DetilItemViewSet(viewsets.ViewSet):
                 cursor.execute("""
                     INSERT INTO tb_project_detil_item 
                     (id_project_detil, item_id, item_code, item_name, ukuran, 
-                    harga_beli, harga_jual, created_by, created_date, updated_by, updated_date, is_deleted)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)
+                    harga_beli, harga_jual, qty, created_by, created_date, updated_by, updated_date, is_deleted)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)
                 """, [
                     id_project_detil, item_id, item_code, item_name, 
-                    ukuran, harga_beli, harga_jual, username, created_date, username, created_date
+                    ukuran, harga_beli, harga_jual, qty, username, created_date, username, created_date
                 ])
 
             return Response({"message": "Detil Item created successfully"}, status=status.HTTP_201_CREATED)
@@ -842,7 +844,7 @@ class DetilItemViewSet(viewsets.ViewSet):
         """ Mendapatkan detail Item data berdasarkan ID """
         with connections['mysql'].cursor() as cursor:
             cursor.execute("SELECT id, id_project_detil, item_id, item_code, item_name, " + 
-                           "ukuran, harga_beli, harga_jual, " + 
+                           "ukuran, harga_beli, harga_jual, qty, " + 
                            "created_by, created_date, updated_by, updated_date, is_deleted " + 
                            "FROM tb_project_detil_item WHERE id = %s", [pk])
             row = cursor.fetchone()
@@ -858,11 +860,12 @@ class DetilItemViewSet(viewsets.ViewSet):
                     "ukuran": row[5],
                     "harga_beli": row[6],
                     "harga_jual": row[7],
-                    "created_by": row[8],
-                    "created_date": row[9],
-                    "updated_by": row[10],
-                    "updated_date": row[11],
-                    "is_deleted": row[12],
+                    "qty": row[8],
+                    "created_by": row[9],
+                    "created_date": row[10],
+                    "updated_by": row[11],
+                    "updated_date": row[12],
+                    "is_deleted": row[13],
                 },
                 status=status.HTTP_200_OK
             )
@@ -884,6 +887,7 @@ class DetilItemViewSet(viewsets.ViewSet):
                 'ukuran': openapi.Schema(type=openapi.TYPE_INTEGER, description='Ukuran Bahan'),
                 'harga_beli': openapi.Schema(type=openapi.TYPE_NUMBER, format="float", description='Harga Beli'),
                 'harga_jual': openapi.Schema(type=openapi.TYPE_NUMBER, format="float", description='Harga Jual'),
+                'qty': openapi.Schema(type=openapi.TYPE_NUMBER, format="float", description='Qty'),
             }
         ),
         responses={200: "Updated"},
@@ -897,6 +901,7 @@ class DetilItemViewSet(viewsets.ViewSet):
         ukuran = request.data.get("ukuran")
         harga_beli = request.data.get("harga_beli")
         harga_jual = request.data.get("harga_jual")
+        qty = request.data.get("qty")
         username = request.user.username  # Username pengguna yang login
         updated_date = now()
 
@@ -906,16 +911,16 @@ class DetilItemViewSet(viewsets.ViewSet):
         with connections['mysql'].cursor() as cursor:
             cursor.execute("""
                     UPDATE tb_project_detil_item SET id_project_detil=%s, item_id=%s, item_code=%s, item_name=%s, 
-                        ukuran=%s, harga_beli=%s, harga_jual=%s, updated_by=%s, updated_date=%s
+                        ukuran=%s, harga_beli=%s, harga_jual=%s, qty=%s, updated_by=%s, updated_date=%s
                     WHERE id=%s
                 """,
                 [id_project_detil, item_id, item_code, item_name, ukuran,  
-                 harga_beli, harga_jual, username, updated_date, pk]
+                 harga_beli, harga_jual, qty, username, updated_date, pk]
             )
 
         return Response({"id": pk, "id_project_detil": id_project_detil, "item_id": item_id, 
                          "item_code": item_code, "item_name": item_name, "harga_beli": harga_beli,
-                         "harga_jual": harga_jual, "updated_by": username, "updated_date": updated_date}, status=status.HTTP_200_OK)
+                         "harga_jual": harga_jual, "qty": qty, "updated_by": username, "updated_date": updated_date}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         manual_parameters=[
@@ -995,7 +1000,7 @@ class DetilItemViewSet(viewsets.ViewSet):
             # Query dengan pagination
             cursor.execute("""
                 SELECT id, id_project_detil, item_id, item_code, item_name,  
-                    ukuran, harga_beli, harga_jual, created_by, created_date, updated_by, updated_date, is_deleted
+                    ukuran, harga_beli, harga_jual, qty, created_by, created_date, updated_by, updated_date, is_deleted
                 FROM tb_project_detil_item
                 WHERE is_deleted = 0 AND (
                     id_project_detil LIKE %s OR 
@@ -1022,11 +1027,12 @@ class DetilItemViewSet(viewsets.ViewSet):
                 "ukuran": row[5], 
                 "harga_beli": row[6], 
                 "harga_jual": row[7],
-                "created_by": row[8],
-                "created_date": row[9],
-                "updated_by": row[10],
-                "updated_date": row[11],
-                "is_deleted": row[12],
+                "qty": row[8],
+                "created_by": row[9],
+                "created_date": row[10],
+                "updated_by": row[11],
+                "updated_date": row[12],
+                "is_deleted": row[13],
             }
             for row in rows
         ]
@@ -1060,7 +1066,7 @@ class DetilItemViewSet(viewsets.ViewSet):
             # Query data berdasarkan id_project_detil
             cursor.execute("""
                 SELECT id, id_project_detil, item_id, item_code, item_name,  
-                    ukuran, harga_beli, harga_jual, created_by, created_date, updated_by, updated_date, is_deleted
+                    ukuran, harga_beli, harga_jual, qty, created_by, created_date, updated_by, updated_date, is_deleted
                 FROM tb_project_detil_item
                 WHERE is_deleted = 0 AND id_project_detil = %s
             """, [id_project_detil])
@@ -1077,11 +1083,12 @@ class DetilItemViewSet(viewsets.ViewSet):
                 "ukuran": row[5],
                 "harga_beli": row[6],
                 "harga_jual": row[7],
-                "created_by": row[8],
-                "created_date": row[9],
-                "updated_by": row[10],
-                "updated_date": row[11],
-                "is_deleted": row[12],
+                "qty": row[8],
+                "created_by": row[9],
+                "created_date": row[10],
+                "updated_by": row[11],
+                "updated_date": row[12],
+                "is_deleted": row[13],
             }
             for row in rows
         ]
