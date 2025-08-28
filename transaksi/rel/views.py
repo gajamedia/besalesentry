@@ -252,9 +252,9 @@ class RelViewSet(viewsets.ViewSet):
         manual_parameters=[
             openapi.Parameter('Authorization', openapi.IN_HEADER, description="Token JWT", type=openapi.TYPE_STRING, default="Bearer "),
             openapi.Parameter('id_project_detil', openapi.IN_QUERY, description="ID Project Detail (Opsional)", type=openapi.TYPE_INTEGER, default=0),
-            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING, default="0"),
-            openapi.Parameter('l', openapi.IN_QUERY, description="L", type=openapi.TYPE_INTEGER, default=0),
-            openapi.Parameter('p', openapi.IN_QUERY, description="P", type=openapi.TYPE_INTEGER, default=0)
+            openapi.Parameter('item_code', openapi.IN_QUERY, description="Kode Item", type=openapi.TYPE_STRING, default="0")
+            # openapi.Parameter('uk_room_l', openapi.IN_QUERY, description="L", type=openapi.TYPE_INTEGER, default=0),
+            # openapi.Parameter('uk_room_p', openapi.IN_QUERY, description="P", type=openapi.TYPE_INTEGER, default=0)
         ],
         responses={200: "Success"}
     )
@@ -262,8 +262,8 @@ class RelViewSet(viewsets.ViewSet):
         """ Menghitung total kebutuhan Bracket L untuk semua detil project """
         id_project_detil = request.GET.get("id_project_detil")
         item_code = request.GET.get("item_code")
-        l = request.GET.get("l")
-        p = request.GET.get("p")
+        # uk_room_l = request.GET.get("uk_room_l")
+        # uk_room_p = request.GET.get("uk_room_p")
 
         # === VALIDASI INPUT ===
         errors = {}
@@ -271,8 +271,8 @@ class RelViewSet(viewsets.ViewSet):
             errors["id_project_detil"] = "id_project_detil harus diisi"
         if not item_code:
             errors["item_code"] = "item_code harus diisi"
-        if not l or not p:
-            errors["lp"] = "l dan p harus diisi"
+        # if not l or not p:
+        #     errors["lp"] = "l dan p harus diisi"
         if errors:
             errors["code"] = "99"
             return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
@@ -300,8 +300,8 @@ class RelViewSet(viewsets.ViewSet):
             kebutuhan_qty_brackets = 0
 
             for detil in detils:
-                # uk_room_l = detil[4]
-                # uk_room_p = detil[5]
+                uk_room_l = detil[4]
+                uk_room_p = detil[5]
                 # nilai_pembagi = detil[9]
 
                 # lebar_total = uk_room_l + uk_room_p
@@ -309,7 +309,7 @@ class RelViewSet(viewsets.ViewSet):
 
 
                 # kebutuhan_qty_rel += kebutuhan_qty_rel
-                kebutuhan_qty_brackets += (l+p)
+                kebutuhan_qty_brackets += ((uk_room_l/60)+(uk_room_p/60))
 
         # Ambil harga jual dari tb_bahan
         harga_satuan = 0
