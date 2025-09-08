@@ -161,7 +161,7 @@ class RelViewSet(viewsets.ViewSet):
         harga_total_roda = kebutuhan_qty_roda * harga_satuan
 
         return Response({
-            "total_qty_roda": round(kebutuhan_qty_roda, 2),
+            "total_qty_roda": math.ceil(kebutuhan_qty_roda),
             "harga_roda": round(harga_total_roda, 2)
         }, status=status.HTTP_200_OK)
 
@@ -244,7 +244,7 @@ class RelViewSet(viewsets.ViewSet):
         harga_total_bracketl = kebutuhan_qty_bracketl * harga_satuan
 
         return Response({
-            "total_qty_bracketl": round(kebutuhan_qty_bracketl, 2),
+            "total_qty_bracketl": math.ceil(kebutuhan_qty_bracketl),
             "harga_bracketl": round(harga_total_bracketl, 2)
         }, status=status.HTTP_200_OK)
 
@@ -329,7 +329,7 @@ class RelViewSet(viewsets.ViewSet):
         harga_total_brackets = kebutuhan_qty_brackets * harga_satuan
 
         return Response({
-            "total_qty_brackets": round(kebutuhan_qty_brackets, 2),
+            "total_qty_brackets": math.ceil(kebutuhan_qty_brackets),
             "harga_brackets": round(harga_total_brackets, 2)
         }, status=status.HTTP_200_OK)
 
@@ -414,7 +414,7 @@ class RelViewSet(viewsets.ViewSet):
         harga_total_stik = kebutuhan_qty_stik * harga_satuan
 
         return Response({
-            "total_qty_stik": round(kebutuhan_qty_stik, 2),
+            "total_qty_stik": math.ceil(kebutuhan_qty_stik),
             "harga_stik": round(harga_total_stik, 2)
         }, status=status.HTTP_200_OK)
 
@@ -493,7 +493,7 @@ class RelViewSet(viewsets.ViewSet):
         harga_total_bracket_ceiling = kebutuhan_qty_bracket_ceiling * harga_satuan
 
         return Response({
-            "total_qty_bc": round(kebutuhan_qty_bracket_ceiling, 2),
+            "total_qty_bc": math.ceil(kebutuhan_qty_bracket_ceiling),
             "harga_bc": round(harga_total_bracket_ceiling, 2)
         }, status=status.HTTP_200_OK)
 
@@ -572,7 +572,7 @@ class RelViewSet(viewsets.ViewSet):
         harga_total_fisher = kebutuhan_qty_fisher * harga_satuan
 
         return Response({
-            "total_qty_fisher": round(kebutuhan_qty_fisher, 2),
+            "total_qty_fisher": math.ceil(kebutuhan_qty_fisher),
             "harga_fisher": round(harga_total_fisher, 2)
         }, status=status.HTTP_200_OK)
 
@@ -646,7 +646,7 @@ class RelViewSet(viewsets.ViewSet):
         harga_total_galvanis24 = kebutuhan_qty_galvanis24 * harga_satuan
 
         return Response({
-            "total_qty_galvanis24": round(kebutuhan_qty_galvanis24, 2),
+            "total_qty_galvanis24": math.ceil(kebutuhan_qty_galvanis24),
             "harga_galvanis24": round(harga_total_galvanis24, 2)
         }, status=status.HTTP_200_OK)
 
@@ -720,6 +720,6 @@ class RelViewSet(viewsets.ViewSet):
         harga_total_jasa_pasang = jasa_pasang_qty * harga_satuan
 
         return Response({
-            "total_qty_jasapasang": round(jasa_pasang_qty, 2),
+            "total_qty_jasapasang": math.ceil(jasa_pasang_qty),
             "harga_jasapasang": round(harga_total_jasa_pasang, 2)
         }, status=status.HTTP_200_OK)
