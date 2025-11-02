@@ -59,7 +59,7 @@ class OtherViewSet(viewsets.ViewSet):
                 stik = detil[11]
 
                 # Hitung kebutuhan kain
-                tinggi_gorden = uk_room_t - elevasi
+                tinggi_gorden = uk_room_t - elevasi - stik
                 lebar_total = uk_room_l + uk_room_p
                 panel = math.ceil(lebar_total / nilai_pembagi)
                 tinggi_kain = (tinggi_gorden - tinggi_vitrase)
